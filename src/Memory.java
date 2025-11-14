@@ -6,7 +6,7 @@ public class Memory {
     private String name;
     private String description;
     Date date = new Date();
-    Relatives[] relatives; 
+    Relative[] relatives; 
     private List<Media> mediaList = new ArrayList<>();
 
     public Memory(String name, Date date) {
@@ -39,27 +39,37 @@ public class Memory {
         this.date = date;
     }
 
-    public Relatives[] getRelatives() {
+    public Relative[] getRelatives() {
         return relatives;
     }
 
-    public void setRelatives(Relatives[] relatives) {
-        this.relatives = relatives;
+    public void setRelatives(Relative relative) {
+        this.relatives[Relative.getNum_of_relatives()] = relative;
     }
 
     public List<Media> getMediaList() {
         return mediaList;
     }
 
-    public void setMediaList(List<Media> mediaList) {
-        this.mediaList = mediaList;
+    public void setMediaList(List<Media> newMediaList) {
+    this.mediaList = new ArrayList<>(); // create a new list
+    if (newMediaList != null) {
+        for (int i = 0; i < newMediaList.size(); i++) {
+            Media m = newMediaList.get(i);
+            System.out.println("Adding media at index " + i);
+            // Create a new Media object using correct constructor
+            this.mediaList.add(new Media(m.getId(), m.getFilePath(), m.getMediaType()));
+        }
+    }
     }
 
-    
-
-    
-
-    
-
+    @Override
+    public String toString() {
+        return "Memory{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", date=" + date +
+                '}';
+    }
 
 }

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Relatives {
+public class Relative {
     private int rel_id;
     private String name;
     private String relationship;
@@ -14,7 +14,7 @@ public class Relatives {
     private List<Media> mediaList = new ArrayList<>();
     private static int num_of_relatives = 0;
 
-    public Relatives(int id, String name, String relationship, String phoneNumber, String gender) {
+    public Relative(int id, String name, String relationship, String phoneNumber, String gender) {
         this.rel_id = id;
         this.name = name;
         this.relationship = relationship;
@@ -103,8 +103,17 @@ public class Relatives {
         this.mediaList = mediaList;
     }
     
+    public static int getNum_of_relatives() {
+        return num_of_relatives;
+    }
 
+    @Override
+    public String toString() {
+        return "Relatives [rel_id=" + rel_id + ", name=" + name + ", relationship=" + relationship + 
+               ", description=" + description + ", phoneNumber=" + phoneNumber + ", email=" + email +
+                ", gender=" + gender                                    
+                + ", address=" + address + ", birthday=" + birthday +
+             ", mediaList=" + mediaList + "]";
+    }         
 
-
-
-}
+}            
