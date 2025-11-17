@@ -2,17 +2,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 public class Memory {
-    private static int id = 0;
+    private static int nextId = 1;
+    private int id;
     private String name;
     private String description;
-    Date date = new Date();
-    Relative[] relatives; 
+    private Date date = new Date();
+    private List<Relative> relatives = new ArrayList<>();
     private List<Media> mediaList = new ArrayList<>();
 
     public Memory(String name, Date date) {
         this.name = name;
         this.date = date;
-        id++;
+        id = nextId++;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -39,28 +48,38 @@ public class Memory {
         this.date = date;
     }
 
-    public Relative[] getRelatives() {
+    public List<Relative> getRelatives() {
         return relatives;
     }
 
-    public void setRelatives(Relative relative) {
-        this.relatives[Relative.getNum_of_relatives()] = relative;
+    public void addRelative(Relative relative) {
+        this.relatives.add(relative);
+    }
+
+    public void setRelatives(List<Relative> newRelatives) {
+        this.relatives = new ArrayList<>();
+        if (newRelatives != null) {
+            for (Relative r : newRelatives) {
+                this.relatives.add(r);
+            }
+        }
     }
 
     public List<Media> getMediaList() {
         return mediaList;
     }
 
-    public void setMediaList(List<Media> newMediaList) {
-    this.mediaList = new ArrayList<>(); // create a new list
-    if (newMediaList != null) {
-        for (int i = 0; i < newMediaList.size(); i++) {
-            Media m = newMediaList.get(i);
-            System.out.println("Adding media at index " + i);
-            // Create a new Media object using correct constructor
-            this.mediaList.add(new Media(m.getId(), m.getFilePath(), m.getMediaType()));
-        }
+    public void addMedia(Media media) {
+        this.mediaList.add(media);
     }
+
+    public void setMediaList(List<Media> newMediaList) {
+        this.mediaList = new ArrayList<>();
+        if (newMediaList != null) {
+            for (Media m : newMediaList) {
+                this.mediaList.add(new Media(m.getFilePath(), m.getMediaType()));
+            }
+        }
     }
 
     @Override

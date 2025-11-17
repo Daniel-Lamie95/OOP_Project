@@ -103,7 +103,7 @@ public class Relative {
         this.mediaList = mediaList;
     }
     
-    public static int getNum_of_relatives() {
+    public int getNum_of_relatives() {
         return num_of_relatives;
     }
 
