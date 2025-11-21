@@ -1,5 +1,5 @@
 import java.time.LocalDateTime;
-public class Reminder extends Patientinfo{
+public class Reminder extends PatientInfo{
 
     private String description;
     private LocalDateTime dateOfReminder;
