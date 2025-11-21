@@ -1,31 +1,31 @@
-public class Caregiver extend user  {
+public class Caregiver extends User  {
     private Patient patient;
     public Caregiver(String name,String id,String email,String password){
         super ( name, id,email, password);
-        this.Patient=patient;
+        this.patient=null;
     }
 
     public Patient getPatient() {
-        return Patient;
+        return patient;
     }
 
     public void setPatient(Patient patient) {
-        this.Patient = patient;
+        this.patient = patient;
     }
     public boolean addPatient(Patient p){
-        if(this.Patient != null){
+        if(this.patient != null){
             System.out.println("you already have patient");
             return false;}
-        else{ this.Patient=p;
+        else{ this.patient=p;
             System.out.println("patient added succesfuly!");
             return true;}
 
     }
-    public boolean deletPatient(Patient p){
-        this.Patient=null;
+    public void deletPatient(Patient p){
+        this.patient=null;
     }
     public boolean editPatient(String name, String stage) {
-        if (thi.patient == null)
+        if (this.patient == null)
             return false;
 
         this.patient.setName(name);
@@ -43,12 +43,13 @@ public class Caregiver extend user  {
             return false;
         return this.patient.addMemory(m);
     }
-    public boolean findMemory(String id) {
-        if (this.patient == null)
-            return false;
+    public Memory findMemory(String id) {
+        if(this.patient ==null){
+            return null;
+        }
         return this.patient.findMemory(id);
     }
-    public boolean editMemory(String id,String name,string description ) {
+    public boolean editMemory(String id,String name,String description ) {
         Memory m = findMemory(id);
         if (m == null) return false;
 
