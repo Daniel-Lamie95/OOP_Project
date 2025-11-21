@@ -1,4 +1,4 @@
-public class Caregiver extends user{
+public class Caregiver extend user  {
     private Patient patient;
     public Caregiver(String name,String id,String email,String password){
         super ( name, id,email, password);
