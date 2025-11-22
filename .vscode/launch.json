@@ -6,7 +6,7 @@
             "name": "JavaFX Run",  // <--- This is the name
             "request": "launch",
             "mainClass": "Main",
-            "vmArgs": "--module-path \"C:\\\\javafx\\\\lib\" --add-modules ALL-MODULE-PATH"
+            "vmArgs": "--module-path 'lib/javafx/lib' --add-modules ALL-MODULE-PATH"
         }
     ]
 }
