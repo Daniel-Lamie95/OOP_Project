@@ -2,14 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Java",
             "type": "java",
-            "name": "Launch",
+            "name": "JavaFX Run",  // <--- This is the name
             "request": "launch",
             "mainClass": "Main",
-            "projectName": "java project",
-            "cwd": "${workspaceFolder}",
-            "vmArgs": "--module-path lib/javafx/lib --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path \"C:\\\\javafx\\\\lib\" --add-modules ALL-MODULE-PATH"
         }
     ]
 }
