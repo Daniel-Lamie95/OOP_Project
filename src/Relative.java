@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-
 public class Relative {
     private int rel_id;
     private String name;
@@ -11,6 +10,7 @@ public class Relative {
     private String gender;
     private String address;
     private String birthday;
+    private String photoPath;
     private List<Media> mediaList = new ArrayList<>();
     private static int num_of_relatives = 0;
 
@@ -101,6 +101,14 @@ public class Relative {
 
     public void setMediaList(List<Media> mediaList) {
         this.mediaList = mediaList;
+    }
+    
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
     }
     
     public int getNum_of_relatives() {

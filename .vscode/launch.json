@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Java",
+            "type": "java",
+            "name": "Launch",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "java project",
+            "cwd": "${workspaceFolder}",
+            "vmArgs": "--module-path lib/javafx/lib --add-modules javafx.controls,javafx.fxml"
+        }
+    ]
+}
