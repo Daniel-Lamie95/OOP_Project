@@ -1,8 +1,11 @@
-public class Caregiver extends User  {
+import java.util.UUID;
+
+public class Caregiver extends User {
     private Patient patient;
-    public Caregiver(String name,String id,String email,String password){
-        super ( name, id,email, password);
-        this.patient=null;
+
+    public Caregiver(String name, UUID Id, String email, String password) {
+        super(name, Id, email, password);
+        this.patient = null;
     }
 
     public Patient getPatient() {
@@ -12,7 +15,8 @@ public class Caregiver extends User  {
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
-    public boolean addPatient(Patient p){
+}
+    /*public boolean addPatient(Patient p){
         if(this.patient != null){
             System.out.println("you already have patient");
             return false;}
@@ -29,14 +33,13 @@ public class Caregiver extends User  {
             return false;
 
         this.patient.setName(name);
-        this.patient.setStage(stage);
         return true;
     }
 
     public boolean deleteMemory(String  id) {
         if (this.patient == null)
             return false;
-        return this.patient.deleteMemory(id);
+
     }
     public boolean addMemory(Memory m) {
         if (this.patient == null)
@@ -87,3 +90,5 @@ public class Caregiver extends User  {
                 '}';
     }
 }
+
+     */
