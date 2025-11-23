@@ -8,3 +8,11 @@
 
 # IntelliJ IDEA workspace files (these change constantly)
 .idea/workspace.xml
+# IDE Files to Exclude from Git
+
+.idea/tasks.xml
+.idea/shelf/
+.idea/dictionaries/
+
+# CoPilot/AI Tooling files to ignore
+.idea/*copilot*.xml
