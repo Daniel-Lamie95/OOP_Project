@@ -1,4 +1,10 @@
-.idea/
-*.iml
-.vscode/
-bin/
+# IntelliJ IDEA build output
+/out/
+/bin/
+
+# Eclipse project files (already deleted, but good to include)
+.project
+.classpath
+
+# IntelliJ IDEA workspace files (these change constantly)
+.idea/workspace.xml
