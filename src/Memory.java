@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 public class Memory {
     private static int nextId = 1;
     private int id;
