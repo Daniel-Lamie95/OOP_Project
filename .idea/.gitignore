@@ -6,3 +6,10 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+# For internal use in a few scenarios
+out/
