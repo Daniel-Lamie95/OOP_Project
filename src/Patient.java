@@ -4,14 +4,14 @@ public class Patient extends User {
     private String patientStage;
     private ArrayList<Relative> relatives;
     private ArrayList<Memory> memories;
-    private ArrayList<Reminder> reminders;
+    //private ArrayList<Reminder> reminders;
 
     public Patient(String name, UUID Id, String email, String password, String patientStage) {
         super(name, Id, email, password);
         this.patientStage = patientStage;
         this.relatives = new ArrayList<>();
         this.memories = new ArrayList<>();
-        this.reminders = new ArrayList<>();
+     //   this.reminders = new ArrayList<>();
     }
 
     public String getPatientStage() {
@@ -30,9 +30,9 @@ public class Patient extends User {
         return memories;
     }
 
-    public ArrayList<Reminder> getReminders() {
-        return reminders;
-    }
+  //  public ArrayList<Reminder> getReminders() {
+   //     return reminders;
+    //}
 }
    /* public Memory searchMemory (UUID Id){
         for (int i=0;i<memories.size();i++) {
