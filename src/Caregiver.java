@@ -3,8 +3,8 @@ import java.util.UUID;
 public class Caregiver extends User {
     private Patient patient;
 
-    public Caregiver(String name, UUID Id, String email, String password) {
-        super(name, Id, email, password);
+    public Caregiver(String name, String email, String password) {
+        super(name, email, password);
         this.patient = null;
     }
 
