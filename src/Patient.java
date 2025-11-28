@@ -34,7 +34,7 @@ public class Patient extends User {
    //     return reminders;
     //}
 }
-
+//
    /* public Memory findMemory (UUID Id){
         for (Memory m: memories) {
             if (m.getId().equals(Id)) {
