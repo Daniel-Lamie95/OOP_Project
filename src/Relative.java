@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+
 public class Relative {
     private int rel_id;
     private String name;
@@ -9,12 +11,19 @@ public class Relative {
     private String email;
     private String gender;
     private String address;
-    private String birthday;
     private String photoPath;
     private List<Media> mediaList = new ArrayList<>();
     private static int num_of_relatives = 0;
 
+    private LocalDate birthday;
+
     public Relative(int id, String name, String relationship, String phoneNumber, String gender) {
+        if (id < 0) {
+            throw new IllegalArgumentException("id must be non-negative");
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("name must not be null or empty");
+        }
         this.rel_id = id;
         this.name = name;
         this.relationship = relationship;
@@ -87,11 +96,11 @@ public class Relative {
         this.address = address;
     }
 
-    public String getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 
@@ -99,15 +108,28 @@ public class Relative {
         return mediaList;
     }
 
-    public void setMediaList(List<Media> mediaList) {
-        this.mediaList = mediaList;
+    public void addMedia(Media m) {
+        if (m != null) {
+            mediaList.add(m);
+        }
     }
-    
+
+    public boolean removeMedia(Media m) {
+        return mediaList.remove(m);
+    }
+
+    public void clearMedia() {
+        mediaList.clear();
+    }
+
     public String getPhotoPath() {
         return photoPath;
     }
 
     public void setPhotoPath(String photoPath) {
+        if(photoPath == null || photoPath.trim().isEmpty()) {
+            throw new IllegalArgumentException("photoPath must not be null or empty");
+        }
         this.photoPath = photoPath;
     }
     
@@ -120,8 +142,8 @@ public class Relative {
         return "Relatives [rel_id=" + rel_id + ", name=" + name + ", relationship=" + relationship + 
                ", description=" + description + ", phoneNumber=" + phoneNumber + ", email=" + email +
                 ", gender=" + gender                                    
-                + ", address=" + address + ", birthday=" + birthday +
+                + ", address=" + address + ", birthday=" + (birthday != null ? birthday.toString() : "null") +
              ", mediaList=" + mediaList + "]";
     }         
 
-}            
+}

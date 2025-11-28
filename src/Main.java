@@ -19,6 +19,7 @@ public class Main extends Application {
     private ListView<String> relativesListView;
     private TextArea detailsArea;
 
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Patient Memory System");
@@ -248,13 +249,13 @@ public class Main extends Application {
             String description = descriptionArea.getText();
 
             if (!name.isEmpty()) {
-                Memory newMemory = new Memory(name, new Date());
+                Memory newMemory = new Memory(name, new Date(), description);
                 newMemory.setDescription(description);
                 
                 // Add media files to the memory
                 for (File mediaFile : mediaFiles) {
                     String mediaType = getMediaType(mediaFile);
-                    Media media = new Media(mediaFile.getAbsolutePath(), mediaType);
+                    Media media = new Media(mediaFile.getAbsolutePath(), mediaType,description);
                     media.setDescription(mediaFile.getName());
                     newMemory.addMedia(media);
                 }
