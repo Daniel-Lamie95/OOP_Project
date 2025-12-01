@@ -6,6 +6,9 @@ public class Patient extends User {
     private ArrayList<Memory> memories;
     //private ArrayList<Reminder> reminders;
 
+    public Patient(){
+    }
+
     public Patient(String name, String email, String password, String patientStage) {
         super(name, email, password);
         this.patientStage = patientStage;
@@ -13,6 +16,15 @@ public class Patient extends User {
         this.memories = new ArrayList<>();
      //   this.reminders = new ArrayList<>();
     }
+
+    public Patient(String name,UUID id, String email, String password, String patientStage) {
+        super(name, id, email, password);
+        this.patientStage = patientStage;
+        this.relatives = new ArrayList<>();
+        this.memories = new ArrayList<>();
+        //   this.reminders = new ArrayList<>();
+    }
+
 
     public String getPatientStage() {
         return patientStage;
@@ -33,8 +45,6 @@ public class Patient extends User {
   //  public ArrayList<Reminder> getReminders() {
    //     return reminders;
     //}
-}
-//
    /* public Memory findMemory (UUID Id){
         for (Memory m: memories) {
             if (m.getId().equals(Id)) {
@@ -73,6 +83,8 @@ public class Patient extends User {
 
 }
 */
+}
+
 
 
 

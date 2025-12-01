@@ -1,10 +1,17 @@
 import java.util.UUID;
-
 public class Caregiver extends User {
     private Patient patient;
 
+    public Caregiver(){
+    }
+
     public Caregiver(String name, String email, String password) {
         super(name, email, password);
+        this.patient = null;
+    }
+
+    public Caregiver(String name,UUID id, String email, String password) {
+        super(name, id, email, password);
         this.patient = null;
     }
 
@@ -15,8 +22,8 @@ public class Caregiver extends User {
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
-}
-    /*public boolean addPatient(Patient p){
+    /*
+    public boolean addPatient(Patient p){
         if(this.patient != null){
             System.out.println("you already have patient");
             return false;}
@@ -89,6 +96,7 @@ public class Caregiver extends User {
                 "patient=" + patient +
                 '}';
     }
+
+   */
 }
-//
-     */
+
