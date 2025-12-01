@@ -3,34 +3,62 @@ import java.util.Objects;
 public class Media {
     private static int nextId = 1;
     private final int id;
-    private String filePath;    // path to photo or video file
-    private String mediaType;  // "image", "video"
-    private String description = ""; // optional description
+    private String filePath;
+    private String mediaType;
+    private String description = "";
 
-    // primary constructor with validation and normalization
     public Media(String filePath, String mediaType, String description) {
-        if (filePath == null || filePath.trim().isEmpty()) {
-            throw new IllegalArgumentException("filePath must not be null or empty");
-        }
-        if (mediaType == null || mediaType.trim().isEmpty()) {
-            throw new IllegalArgumentException("mediaType must not be null or empty");
-        }
-        this.id = nextId++;
+        validatefilepath(filePath);
+        validatemediatype(mediaType);
+        this.id = nextIdAndIncrement();
         this.filePath = filePath;
         this.mediaType = mediaType;
         this.description = description == null ? "" : description;
     }
+    public Media(int id, String filePath, String mediaType, String description) {
+        validateId(id);
+        validatefilepath(filePath);
+        validatemediatype(mediaType);
+        this.id = id;
+        this.filePath = filePath;
+        this.mediaType = mediaType;
+        this.description = description == null ? "" : description;
+        synchronized (Media.class) {
+            if (id >= nextId)  nextId = id + 1;
+        }
+    }
 
+    private static synchronized int nextIdAndIncrement(){
+        return nextId++;
+    }
+
+    public static synchronized int getNextId() {
+        return nextId;
+    }
+
+    private void validatefilepath(String filePath) {
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new IllegalArgumentException("filePath must not be null or empty");
+        }
+    }
+    private void validatemediatype(String mediaType) {
+        if (mediaType == null || mediaType.trim().isEmpty()) {
+            throw new IllegalArgumentException("mediaType must not be null or empty");
+        }
+    }
+
+    private void validateId(int id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("id must be non-negative");
+        }
+    }
+    
     public int getId() {
         return id;
     }
 
     public String getFilePath() {
         return filePath;
-    }
-
-    public static int getNextId() {
-        return nextId;
     }
 
     public String getDescription() {
@@ -69,7 +97,7 @@ public class Media {
                 ", description='" + description + '\'' +
                 '}';
     }
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
