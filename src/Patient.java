@@ -6,8 +6,8 @@ public class Patient extends User {
     private ArrayList<Memory> memories;
     //private ArrayList<Reminder> reminders;
 
-    public Patient(String name, UUID Id, String email, String password, String patientStage) {
-        super(name, Id, email, password);
+    public Patient(String name, String email, String password, String patientStage) {
+        super(name, email, password);
         this.patientStage = patientStage;
         this.relatives = new ArrayList<>();
         this.memories = new ArrayList<>();
@@ -34,32 +34,30 @@ public class Patient extends User {
    //     return reminders;
     //}
 }
-   /* public Memory searchMemory (UUID Id){
-        for (int i=0;i<memories.size();i++) {
-            Memory m =memories.get(i);
+//
+   /* public Memory findMemory (UUID Id){
+        for (Memory m: memories) {
             if (m.getId().equals(Id)) {
                 return m;
             }
-        }
         return null;
     }
-    public Reminder findReminder (String Id){
-        ArrayList<Reminder> reminders;
-        for(Reminder r:reminders){
 
-        }
-
+    public Reminder findReminder (UUID Id){
+        for (Reminder r: reminders) {
+            if (r.getId().equals(Id)) {
+                return r;
+            }
         return null;
     }
     public Relative findRelative (UUID Id){
-        for (int i=0;i<relatives.size();i++) {
-            Relative rel =relatives.get(i);
-            if (rel.getId().equals(Id)) {
-                return rel;
+          for (Relative re: relatives) {
+            if (re.getId().equals(Id)) {
+                return re;
             }
-        }
         return null;
     }
+
     @Override
     public String toString() {
         return "Patient { " +
