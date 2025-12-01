@@ -21,13 +21,16 @@ public class Memory {
         this.name = name;
         this.description = description;
         setDate(date);
-        id = nextId++;
+        id = nextIdAndIncrement();
     }
 
+
+    public static synchronized int nextIdAndIncrement() {
+        return nextId++;
+    }
     public int getId() {
         return id;
     }
-
 
     public String getName() {
         return name;
@@ -112,7 +115,7 @@ public class Memory {
         // ignore nulls and avoid duplicate media (by file path)
         if (media != null && !mediaExists(media.getFilePath())) {
             // store a defensive copy (consistent with setMediaList which creates new Media instances)
-            this.mediaList.add(new Media(media.getFilePath(), media.getMediaType(), media.getDescription()));
+            this.mediaList.add(new Media(media.getId(),media.getFilePath(), media.getMediaType(), media.getDescription()));
         }
     }
 
@@ -138,7 +141,7 @@ public class Memory {
         if (newMediaList != null) {
             for (Media m : newMediaList) {
                 if (m != null && !mediaExists(m.getFilePath())) {
-                    this.mediaList.add(new Media(m.getFilePath(), m.getMediaType(), m.getDescription()));
+                    this.mediaList.add(new Media(m.getId(),m.getFilePath(), m.getMediaType(), m.getDescription()));
                 }
             }
         }
