@@ -1,4 +1,4 @@
-/*
+import java.util.UUID;
 import java.time.LocalDateTime;
 public class Reminder extends PatientInfo{
 
@@ -6,8 +6,8 @@ public class Reminder extends PatientInfo{
     private LocalDateTime dateOfReminder;
     private Boolean isDone = false;
 
-    public Reminder(String Id , String Name, String description, LocalDateTime dateOfReminder) {
-        super(Id , Name);
+    public Reminder(UUID id , String name, String description, LocalDateTime dateOfReminder) {
+        super(id , name);
         this.description = description;
         this.dateOfReminder = dateOfReminder;
     }
@@ -40,9 +40,14 @@ public class Reminder extends PatientInfo{
     public void notifyIfDue() {
         LocalDateTime now = LocalDateTime.now();
 
-        if (!isDone && now.isAfter(dateOfReminder)) {
+        if(!isDone && now.isAfter(dateOfReminder)) {
             System.out.println("Reminder:" + description + "(for" + getName() +")");
         }
     }
+    public  void addPatientInfo(PatientInfo patientInfo){
+        if(patientInfo instanceof Reminder){
+
+        }
+
+    }
 }
-*/

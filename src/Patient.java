@@ -4,7 +4,8 @@ public class Patient extends User {
     private String patientStage;
     private ArrayList<Relative> relatives;
     private ArrayList<Memory> memories;
-    //private ArrayList<Reminder> reminders;
+    private ArrayList<Reminder> reminders;
+
 
     public Patient(){
     }
