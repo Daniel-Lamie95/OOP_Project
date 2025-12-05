@@ -7,10 +7,14 @@ public class CaregiverService extends UserService{
 
     @Override
     public void signUp(User user) {
-        if (user.getName() == null || user.getName().isEmpty() || user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@") ||
-                user.getPassword() == null || user.getPassword().length() < 6)
+        if (user.getName() == null || user.getName().isEmpty() || user.getEmail() == null || user.getEmail().isEmpty()
+                || !user.getEmail().contains("@") || user.getPassword() == null || user.getPassword().length() < 6) {
             System.out.println("invalid");
-        return;
+            return;
+        }
+        boolean added = addUser(user);
+        if (!added) {
+            System.out.println("email already exists");
+        }
     }
-
 }

@@ -8,6 +8,10 @@ public class Patient extends User implements Searchable{
 
     public Patient() {
         super();
+        this.patientStage = null;
+        this.relatives = new ArrayList<>();
+        this.memories = new ArrayList<>();
+        this.reminders = new ArrayList<>();
     }
 
     public Patient(String name, String email, String password, String patientStage) {
@@ -45,9 +49,11 @@ public class Patient extends User implements Searchable{
     public ArrayList<Reminder> getReminders() {
         return reminders;
     }
+
     public void addMemories(Memory m){
         memories.add(m);
     }
+
     public void addRelatives(Relative re){
         relatives.add(re);
     }
@@ -56,14 +62,16 @@ public class Patient extends User implements Searchable{
         reminders.add(r);
     }
 
-    public void deleteReminder(String id){
-        reminders.removeIf(r -> r.getId().equals(id));
+    public void deleteReminder(String name){
+        reminders.removeIf(r -> r.getName().equals(name));
     }
-    public void deleteMemory(String id){
-        memories.removeIf(m -> m.getId().equals(id));
+
+    public void deleteMemory(String name){
+        memories.removeIf(m -> m.getName().equals(name));
     }
-    public void deleteRelative(String id ){
-        relatives.removeIf(re -> re.getId().equals(id));
+
+    public void deleteRelative(String name){
+        relatives.removeIf(re -> re.getName().equals(name));
     }
 
     @Override
@@ -76,7 +84,6 @@ public class Patient extends User implements Searchable{
 
     @Override
     public Reminder findReminder(String name) {
-
         for (Reminder r : getReminders())
             if (r.getName().equals(name))
                 return r;
@@ -97,6 +104,7 @@ public class Patient extends User implements Searchable{
                 "patientStage='" + patientStage + '\'' +
                 ", relatives=" + relatives +
                 ", memories=" + memories +
+                ", reminders=" + reminders +
                 '}';
     }
 }

@@ -46,7 +46,6 @@ public abstract class User extends Person {
     public String toString() {
         return "User{" +
                 "email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 }
