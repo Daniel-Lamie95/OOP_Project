@@ -1,15 +1,23 @@
-/*
+import java.io.Serializable;
+import java.util.UUID;
 import java.time.LocalDateTime;
-public class Reminder extends PatientInfo{
+import java.io.Serializable;
 
+
+public class Reminder extends PatientInfo implements Serializable {
     private String description;
     private LocalDateTime dateOfReminder;
     private Boolean isDone = false;
 
-    public Reminder(String Id , String Name, String description, LocalDateTime dateOfReminder) {
-        super(Id , Name);
+    public Reminder(UUID id , String name, String description, LocalDateTime dateOfReminder) {
+        super(id , name);
         this.description = description;
         this.dateOfReminder = dateOfReminder;
+    }
+
+    @Override
+    public String getInfoSummary() {
+        return  getName() + "(for " + getDescription()+ ") on " + dateOfReminder.toString();
     }
 
     public String getDescription() {
@@ -38,11 +46,18 @@ public class Reminder extends PatientInfo{
         }
     }
     public void notifyIfDue() {
+        // avoid NPE when dateOfReminder is null
+        if (dateOfReminder == null) return;
         LocalDateTime now = LocalDateTime.now();
 
-        if (!isDone && now.isAfter(dateOfReminder)) {
+        if(!isDone && now.isAfter(dateOfReminder)) {
             System.out.println("Reminder:" + description + "(for" + getName() +")");
         }
     }
+    public  void addPatientInfo(PatientInfo patientInfo){
+        if(patientInfo instanceof Reminder){
+
+        }
+
+    }
 }
-*/

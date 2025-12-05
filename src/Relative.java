@@ -1,8 +1,10 @@
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 
-public class Relative {
+public class Relative implements Serializable {
     private int rel_id;
     private String name;
     private String relationship;
