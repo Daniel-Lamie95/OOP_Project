@@ -1,39 +1,26 @@
+import java.util.UUID;
 import java.util.Objects;
 
-public class Media {
-    private static int nextId = 1;
-    private final int id;
-    private String filePath;
+public class Media{
+    private UUID id;
+    private String mediaPath;
     private String mediaType;
     private String description = "";
 
     public Media(String filePath, String mediaType, String description) {
+        // validate inputs
         validatefilepath(filePath);
         validatemediatype(mediaType);
-        this.id = nextIdAndIncrement();
-        this.filePath = filePath;
+        this.mediaPath = filePath;
         this.mediaType = mediaType;
         this.description = description == null ? "" : description;
     }
-    public Media(int id, String filePath, String mediaType, String description) {
-        validateId(id);
-        validatefilepath(filePath);
-        validatemediatype(mediaType);
+
+    public UUID getId() {
+        return id;
+    }
+    public void setId(UUID id) {
         this.id = id;
-        this.filePath = filePath;
-        this.mediaType = mediaType;
-        this.description = description == null ? "" : description;
-        synchronized (Media.class) {
-            if (id >= nextId)  nextId = id + 1;
-        }
-    }
-
-    private static synchronized int nextIdAndIncrement(){
-        return nextId++;
-    }
-
-    public static synchronized int getNextId() {
-        return nextId;
     }
 
     private void validatefilepath(String filePath) {
@@ -52,13 +39,9 @@ public class Media {
             throw new IllegalArgumentException("id must be non-negative");
         }
     }
-    
-    public int getId() {
-        return id;
-    }
 
-    public String getFilePath() {
-        return filePath;
+    public String getMediaPath() {
+        return mediaPath;
     }
 
     public String getDescription() {
@@ -74,12 +57,11 @@ public class Media {
         this.description = description == null ? "" : description;
     }
 
-    public void setFilePath(String filePath) {
-        if (filePath == null || filePath.trim().isEmpty()) {
+    public void setFilePath(String mediaPath) {
+        if (mediaPath == null || mediaPath.trim().isEmpty()) {
             throw new IllegalArgumentException("filePath must not be null or empty");
         }
-        this.filePath = filePath;
-    }
+        this.mediaPath = mediaPath;    }
 
     public void setMediaType(String mediaType) {
         if (mediaType == null || mediaType.trim().isEmpty()) {
@@ -92,7 +74,7 @@ public class Media {
     public String toString() {
         return "Media{" +
                 "id=" + id +
-                ", filePath='" + filePath + '\'' +
+                ", mediaPath='" + mediaPath + '\'' +
                 ", mediaType='" + mediaType + '\'' +
                 ", description='" + description + '\'' +
                 '}';
@@ -103,7 +85,7 @@ public class Media {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Media media = (Media) o;
-        return id == media.id;
+        return Objects.equals(id, media.id);
     }
 
     @Override

@@ -1,43 +1,24 @@
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-public class Memory {
-    private static int nextId = 1;
-    private int id;
-    private String name;
+public class Memory extends PatientInfo {
     private String description;
     private Date date = new Date();
+    private List<Relative> relatives = new ArrayList<>();
+    private List<Media> mediaList = new ArrayList<>();
 
-    private final List<Relative> relatives = new ArrayList<>();
-
-    private final List<Media> mediaList = new ArrayList<>();
-
-    public Memory(String name, Date date, String description) {
-        if (name == null) {
-            throw new IllegalArgumentException("Memory name must not be null.");
-        }
-        this.name = name;
-        this.description = description;
-        setDate(date);
-        id = nextIdAndIncrement();
+    public Memory(UUID id, String name) {
+        super(id, name);
     }
 
-
-    public static synchronized int nextIdAndIncrement() {
-        return nextId++;
-    }
-    public int getId() {
-        return id;
+    public Memory(UUID id, String name, String description, Date date, List<Relative> relatives, List<Media> mediaList) {
+        super(id, name);
+        this.description = description == null ? "" : description;
+        setDate(date); // use setter to enforce non-null past date
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public String getInfoSummary() {
+        return getName() + " on " + getDate().toString();
     }
 
     public String getDescription() {
@@ -53,15 +34,14 @@ public class Memory {
         return date == null ? null : new Date(date.getTime());
     }
 
-    // store a defensive copy; require a non-null past date (memories represent past events)
+    // store a defensive copy; accept null by defaulting to now and avoid throwing on future dates
     public void setDate(Date date) {
-        if (date == null) {
-            throw new IllegalArgumentException("Memory date must not be null and must be in the past.");
-        }
-        Date toSet = new Date(date.getTime());
+        // defensively default null to current time
+        Date toSet = (date == null) ? new Date() : new Date(date.getTime());
         long now = System.currentTimeMillis();
-        if (toSet.getTime() >= now) {
-            throw new IllegalArgumentException("Memory date must be in the past (no future dates allowed).");
+        // If caller passed a future date, clamp to now instead of throwing to avoid crashes
+        if (toSet.getTime() > now) {
+            toSet = new Date();
         }
         this.date = toSet;
     }
@@ -96,7 +76,6 @@ public class Memory {
             }
         }
     }
-
     public List<Media> getMediaList() {
         // return defensive copy to prevent external mutation of internal list
         return new ArrayList<>(mediaList);
@@ -106,25 +85,28 @@ public class Memory {
     private boolean mediaExists(String filePath) {
         if (filePath == null) return false;
         for (Media mm : mediaList) {
-            if (filePath.equals(mm.getFilePath())) return true;
+            if (filePath.equals(mm.getMediaPath())) return true;
         }
         return false;
     }
 
     public void addMedia(Media media) {
-        // ignore nulls and avoid duplicate media (by file path)
-        if (media != null && !mediaExists(media.getFilePath())) {
-            // store a defensive copy (consistent with setMediaList which creates new Media instances)
-            this.mediaList.add(new Media(media.getId(),media.getFilePath(), media.getMediaType(), media.getDescription()));
-        }
+        // ignore nulls and avoid duplicate or invalid media (by file path)
+        if (media == null) return;
+        String path = media.getMediaPath();
+        if (path == null || path.isBlank()) return; // skip invalid media
+        if (mediaExists(path)) return; // already added
+        String type = media.getMediaType() == null ? "file" : media.getMediaType();
+        // store a defensive copy
+        this.mediaList.add(new Media(path, type, media.getDescription()));
     }
 
     public boolean removeMedia(Media media) {
-        if (media == null || media.getFilePath() == null) return false;
-        String target = media.getFilePath();
+        if (media == null || media.getMediaPath() == null) return false;
+        String target = media.getMediaPath();
         for (int i = 0; i < mediaList.size(); i++) {
             Media m = mediaList.get(i);
-            if (target.equals(m.getFilePath())) {
+            if (target.equals(m.getMediaPath())) {
                 mediaList.remove(i);
                 return true;
             }
@@ -140,31 +122,30 @@ public class Memory {
         this.mediaList.clear();
         if (newMediaList != null) {
             for (Media m : newMediaList) {
-                if (m != null && !mediaExists(m.getFilePath())) {
-                    this.mediaList.add(new Media(m.getId(),m.getFilePath(), m.getMediaType(), m.getDescription()));
+                if (m != null && !mediaExists(m.getMediaPath())) {
+                    this.mediaList.add(new Media(m.getMediaPath(), m.getMediaType(), m.getDescription()));
                 }
             }
         }
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Memory memory = (Memory) o;
-        return id == memory.id;
+        return Objects.equals(getId(), memory.getId());
     }
 
     // Ensure equals/hashCode contract: objects equal by 'id' must return same hash code.
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "Memory{" +
-                "name='" + name + '\'' +
+                "name='" + getName() + '\'' +
                 ", description='" + description + '\'' +
                 ", date=" + (getDate()) +
                 '}';

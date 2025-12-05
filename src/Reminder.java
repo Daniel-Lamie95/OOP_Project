@@ -12,6 +12,11 @@ public class Reminder extends PatientInfo{
         this.dateOfReminder = dateOfReminder;
     }
 
+    @Override
+    public String getInfoSummary() {
+        return  getName() + "(for " + getDescription()+ ") on " + dateOfReminder.toString();
+    }
+
     public String getDescription() {
         return description;
     }
@@ -38,6 +43,8 @@ public class Reminder extends PatientInfo{
         }
     }
     public void notifyIfDue() {
+        // avoid NPE when dateOfReminder is null
+        if (dateOfReminder == null) return;
         LocalDateTime now = LocalDateTime.now();
 
         if(!isDone && now.isAfter(dateOfReminder)) {

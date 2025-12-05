@@ -24,7 +24,7 @@ public abstract class PatientInfo {
     public void setName(String name) {
         this.name = name;
     }
-    public abstract void addPatientInfo(PatientInfo patientInfo);
+    public abstract String getInfoSummary();
 
     @Override
     public String toString() {
