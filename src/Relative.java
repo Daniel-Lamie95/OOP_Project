@@ -1,10 +1,9 @@
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 
-public class Relative implements Serializable{
-    private static final long serialVersionUID = 1L;
+public class Relative {
     private int rel_id;
     private String name;
     private String relationship;
