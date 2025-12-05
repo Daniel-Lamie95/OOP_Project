@@ -1,5 +1,7 @@
 import java.util.UUID;
-public class Caregiver extends User implements Searchable{
+import java.io.Serializable;
+public class Caregiver extends User implements Searchable, Serializable{
+    private static final long serialVersionUID = 1L;
     private Patient patient;
 
     public Caregiver(){

@@ -1,6 +1,8 @@
+import java.io.Serializable;
 import java.util.*;
 import java.util.UUID;
-public class Patient extends User implements Searchable{
+import java.io.Serializable;
+public class Patient extends User implements Searchable, Serializable{
     private String patientStage;
     private ArrayList<Relative> relatives;
     private ArrayList<Memory> memories;
