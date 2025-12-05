@@ -34,11 +34,18 @@ public abstract class User extends Person {
         this.password = password;
     }
 
-    //public boolean checkInfo(String email, String password) {
-    //    if (email == null || password == null) {
-    //        return false;
-     //   }
-     //  return this.email.equals(email) && this.password.equals(password);
-   // }
+  public boolean checkInfo(String email, String password) {
+        if (email == null || password == null) {
+            return false;
+       }
+      return this.email.equals(email) && this.password.equals(password);
+   }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }

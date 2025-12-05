@@ -1,12 +1,12 @@
 import java.util.*;
 import java.util.UUID;
-public class Patient extends User {
+public class Patient extends User implements Searchable{
     private String patientStage;
     private ArrayList<Relative> relatives;
     private ArrayList<Memory> memories;
-    //private ArrayList<Reminder> reminders;
+    private ArrayList<Reminder> reminders;
 
-    public Patient(){
+    public Patient() {
     }
 
     public Patient(String name, String email, String password, String patientStage) {
@@ -14,17 +14,16 @@ public class Patient extends User {
         this.patientStage = patientStage;
         this.relatives = new ArrayList<>();
         this.memories = new ArrayList<>();
-     //   this.reminders = new ArrayList<>();
+        this.reminders = new ArrayList<>();
     }
 
-    public Patient(String name,UUID id, String email, String password, String patientStage) {
+    public Patient(String name, UUID id, String email, String password, String patientStage) {
         super(name, id, email, password);
         this.patientStage = patientStage;
         this.relatives = new ArrayList<>();
         this.memories = new ArrayList<>();
-        //   this.reminders = new ArrayList<>();
+        this.reminders = new ArrayList<>();
     }
-
 
     public String getPatientStage() {
         return patientStage;
@@ -42,52 +41,40 @@ public class Patient extends User {
         return memories;
     }
 
-  //  public ArrayList<Reminder> getReminders() {
-   //     return reminders;
-    //}
-   /* public Memory findMemory (UUID Id){
-        for (Memory m: memories) {
-            if (m.getId().equals(Id)) {
+    public ArrayList<Reminder> getReminders() {
+        return reminders;
+    }
+
+    @Override
+    public Memory findMemory(UUID id) {
+        for (Memory m : memories)
+            if (m.getId().equals(id))
                 return m;
-            }
         return null;
     }
 
-    public Reminder findReminder (UUID Id){
-        for (Reminder r: reminders) {
-            if (r.getId().equals(Id)) {
+    @Override
+    public Reminder findReminder(UUID id) {
+        for (Reminder r : reminders)
+            if (r.getId().equals(id))
                 return r;
-            }
         return null;
     }
-    public Relative findRelative (UUID Id){
-          for (Relative re: relatives) {
-            if (re.getId().equals(Id)) {
-                return re;
-            }
+
+    @Override
+    public Relative findRelative(UUID id) {
+        for (Relative rel : relatives)
+            if (rel.getId().equals(id))
+                return rel;
         return null;
     }
 
     @Override
     public String toString() {
-        return "Patient { " +
-                "id=" + getId() +
-                ", name=" + getName() +
-                ", email=" + getEmail() +
-                ", patientStage=" + patientStage +
+        return "Patient{" +
+                "patientStage='" + patientStage + '\'' +
                 ", relatives=" + relatives +
                 ", memories=" + memories +
-                ", reminders=" + reminders +
-                " }";
+                '}';
     }
-
 }
-*/
-}
-
-
-
-
-
-
-
