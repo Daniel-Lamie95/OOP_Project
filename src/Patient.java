@@ -45,27 +45,43 @@ public class Patient extends User implements Searchable{
     public ArrayList<Reminder> getReminders() {
         return reminders;
     }
+    public void addMemories(Memory m){
+        memories.add(m);
+    }
+    public void addRelatives(Relative r){
+        relatives.add(r);
+    }
+    public void addReminder(Reminder r){
+        reminders.add(r);
+    }
+    public void deleteReminder(String id){
+        reminders.removeIf(r -> r.getId().equals(id));
+    }
+    public void deleteMemory(String id){
+        memories.removeIf(m -> m.getId().equals(id));
+    }
 
     @Override
-    public Memory findMemory(UUID id) {
-        for (Memory m : memories)
-            if (m.getId().equals(id))
+    public Memory findMemory(String memoryName) {
+        for (Memory m :  getMemories())
+            if (m.getName().equals(memoryName))
                 return m;
         return null;
     }
 
     @Override
-    public Reminder findReminder(UUID id) {
-        for (Reminder r : reminders)
-            if (r.getId().equals(id))
+    public Reminder findReminder(String name) {
+
+        for (Reminder r : getReminders())
+            if (r.getName().equals(name))
                 return r;
         return null;
     }
 
     @Override
-    public Relative findRelative(UUID id) {
-        for (Relative rel : relatives)
-            if (rel.getId().equals(id))
+    public Relative findRelative(String name) {
+        for (Relative rel : getRelatives())
+            if (rel.getName().equals(name))
                 return rel;
         return null;
     }

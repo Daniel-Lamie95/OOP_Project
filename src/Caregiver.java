@@ -33,7 +33,7 @@ public class Caregiver extends User implements Searchable{
             return true;}
     }
 
-   public void deletPatient(Patient p){
+    public void deletePatient(Patient p){
         this.patient=null;
     }
 
@@ -47,66 +47,85 @@ public class Caregiver extends User implements Searchable{
     public boolean deleteMemory(String  id) {
         if (this.patient == null)
             return false;
+        else {
+            this.patient.deleteMemory(id);
+            return true;
+        }
+
     }
 
     public boolean addMemory(Memory m) {
         if (this.patient == null)
             return false;
-        return this.patient.addMemory(m);
+        else{
+            this.patient.addMemories(m);
+            return true;
+        }
+
     }
 
 
-    public boolean editMemory(String id,String name,String description ) {
-        Memory m = findMemory(id);
-        if (m == null) return false;
-        m.setName(name);
-        m.setDescription(description);
-        return true;
+    public void editMemory(String memoryName,String newMemoryName,String description ) throws Exception {
+        if (this.patient == null)
+            throw new Exception("patient is null");
+        else {
+            Memory m = findMemory(memoryName);
+            if (m == null)
+                throw new Exception("memories not found");
+            m.setName(newMemoryName);
+            m.setDescription(description);
+        }
     }
 
     public boolean addReminder(Reminder r) {
         if (patient == null) return false;
-        return patient.addReminder(r);
+        else {
+            patient.addReminder(r);
+            return true;
+        }
     }
 
 
-   public boolean deleteReminder(String id) {
+    public boolean deleteReminder(String id) {
         if (patient == null) return false;
-        return patient.deleteReminder(id);
+        else {
+            patient.deleteReminder(id);
+            return true;
+        }
     }
 
-   public boolean editReminder(String id, String name, String description) {
-        Reminder r = findReminder(id);
+    public boolean editReminder(String oldName, String newName, String description) {
+        Reminder r = findReminder(oldName);
         if (r == null) return false;
-        r.setName(name);
+        r.setName(newName);
         r.setDescription(description);
         return true;
     }
 
     @Override
-    public Memory findMemory(UUID id) {
-        for (Memory m : memories)
-            if (m.getId().equals(id))
+    public Memory findMemory(String memoryName) {
+        for (Memory m :  patient.getMemories())
+            if (m.getName().equals(memoryName))
                 return m;
         return null;
     }
 
     @Override
-    public Reminder findReminder(UUID id) {
-        for (Reminder r : reminders)
-            if (r.getId().equals(id))
+    public Reminder findReminder(String name) {
+
+        for (Reminder r : patient.getReminders())
+            if (r.getName().equals(name))
                 return r;
         return null;
     }
 
     @Override
-    public Relative findRelative(UUID id) {
-        for (Relative rel : relatives)
-            if (rel.getId().equals(id))
+    public Relative findRelative(String name) {
+        for (Relative rel : patient.getRelatives())
+            if (rel.getName().equals(name))
                 return rel;
         return null;
     }
-
 
     @Override
     public String toString() {
