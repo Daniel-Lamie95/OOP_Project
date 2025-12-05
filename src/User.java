@@ -1,5 +1,7 @@
+import java.io.Serializable;
 import java.util.UUID;
-public abstract class User extends Person {
+import java.io.Serializable;
+public abstract class User extends Person implements Serializable {
     private String email;
     private String password;
 

@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class FileHandler {
-    private static final String ACCOUNTS_FILE = "accounts.txt"; // can be .txt, .dat, .json, etc.
+    private static final String ACCOUNTS_FILE = "accounts.txt";
 
     public void saveAccounts(ArrayList<User> users) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ACCOUNTS_FILE))) {
