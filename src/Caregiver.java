@@ -17,6 +17,7 @@ public class Caregiver extends User implements Searchable{
     }
 
     public Patient getPatient() {
+
         return patient;
     }
 
@@ -24,46 +25,44 @@ public class Caregiver extends User implements Searchable{
         this.patient = patient;
     }
 
-    public boolean addPatient(Patient p){
+    public void addPatient(Patient p) throws Exception {
         if(this.patient != null){
-            System.out.println("you already have patient");
-            return false;}
-        else{ this.patient=p;
-            System.out.println("patient added successfully");
-            return true;}
-    }
-
-    public void deletePatient(Patient p){
-        this.patient=null;
-    }
-
-    public boolean editPatient(String name, String stage) {
-        if (this.patient == null)
-            return false;
-        this.patient.setName(name);
-        return true;
-    }
-
-    public boolean deleteMemory(String  id) {
-        if (this.patient == null)
-            return false;
+            throw new Exception("patient is null");}
         else {
-            this.patient.deleteMemory(id);
-            return true;
+            this.patient = p;
         }
-
     }
 
-    public boolean addMemory(Memory m) {
+    public void deletePatient(String id) throws Exception{
+        if (patient == null)
+            throw new Exception("patient is null");
+        else {
+            patient=null;
+        }
+    }
+
+    public void editPatient(String name, String patientStage)  throws Exception{
         if (this.patient == null)
-            return false;
+            throw new Exception("patient is null");
+        this.patient.setName(name);
+        this.patient.setPatientStage(patientStage);
+    }
+
+    public void addMemory(Memory m) throws Exception{
+        if (this.patient == null)
+            throw new Exception("patient is null");
         else{
             this.patient.addMemories(m);
-            return true;
         }
-
     }
 
+    public void deleteMemory(String  name) throws Exception {
+        if (this.patient == null)
+            throw new Exception("patient is null");
+        else {
+            this.patient.deleteMemory(name);
+        }
+    }
 
     public void editMemory(String memoryName,String newMemoryName,String description ) throws Exception {
         if (this.patient == null)
@@ -77,29 +76,61 @@ public class Caregiver extends User implements Searchable{
         }
     }
 
-    public boolean addReminder(Reminder r) {
-        if (patient == null) return false;
+    public void addReminder(Reminder r) throws Exception {
+        if (patient == null)
+            throw new Exception("patient is null");
         else {
             patient.addReminder(r);
-            return true;
         }
     }
 
-
-    public boolean deleteReminder(String id) {
-        if (patient == null) return false;
+    public void deleteReminder(String name) throws Exception{
+        if (patient == null)
+            throw new Exception("patient is null");
         else {
-            patient.deleteReminder(id);
-            return true;
+            patient.deleteReminder(name);
+
         }
     }
 
-    public boolean editReminder(String oldName, String newName, String description) {
+    public void editReminder(String oldName, String newName, String description) throws Exception {
         Reminder r = findReminder(oldName);
-        if (r == null) return false;
+        if (r == null)
+            throw new Exception("patient is null");
         r.setName(newName);
         r.setDescription(description);
-        return true;
+
+    }
+    public void addRelative(Relative re) throws Exception{
+            if (patient == null)
+                throw new Exception("patient is null");
+            else {
+                patient.addRelatives(re);
+            }
+    }
+
+    public void deleteRelative(String name) throws Exception{
+        if (patient == null)
+            throw new Exception("patient is null");
+        else {
+            patient.deleteRelative(name);
+
+        }
+    }
+
+    public void editRelative( String name,String relationship, String description, String phoneNumber, String email, String gender, String address, String photoPath) throws Exception{
+       Relative re=findRelative(name);
+        if (re == null)
+            throw new Exception("relative is null");
+        else{
+            re.setRelationship(relationship);
+            re.setDescription(description);
+            re.setPhoneNumber(phoneNumber);
+            re.setEmail(email);
+            re.setGender(gender);
+            re.setAddress(address);
+            re.setPhotoPath(photoPath);
+        }
     }
 
     @Override
@@ -133,7 +164,5 @@ public class Caregiver extends User implements Searchable{
                 "patient=" + patient +
                 '}';
     }
-
-
 }
 

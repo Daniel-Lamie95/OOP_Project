@@ -11,6 +11,7 @@ public class PatientService extends UserService {
                 || user.getPassword() == null || user.getPassword().length()<6 || patient.getPatientStage() == null || patient.getPatientStage().isEmpty())
             System.out.println("invalid");
         return;
+
     }
 
 }

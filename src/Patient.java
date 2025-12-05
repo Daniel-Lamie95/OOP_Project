@@ -48,17 +48,22 @@ public class Patient extends User implements Searchable{
     public void addMemories(Memory m){
         memories.add(m);
     }
-    public void addRelatives(Relative r){
-        relatives.add(r);
+    public void addRelatives(Relative re){
+        relatives.add(re);
     }
+
     public void addReminder(Reminder r){
         reminders.add(r);
     }
+
     public void deleteReminder(String id){
         reminders.removeIf(r -> r.getId().equals(id));
     }
     public void deleteMemory(String id){
         memories.removeIf(m -> m.getId().equals(id));
+    }
+    public void deleteRelative(String id ){
+        relatives.removeIf(re -> re.getId().equals(id));
     }
 
     @Override
