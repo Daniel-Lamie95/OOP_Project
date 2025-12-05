@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 
-public class Relative implements Serializable {
-    private int rel_id;
-    private String name;
+public class Relative extends Person implements Serializable {
     private String relationship;
     private String description;
     private String phoneNumber;
@@ -19,36 +17,18 @@ public class Relative implements Serializable {
 
     private LocalDate birthday;
 
-    public Relative(int id, String name, String relationship, String phoneNumber, String gender) {
-        if (id < 0) {
-            throw new IllegalArgumentException("id must be non-negative");
-        }
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("name must not be null or empty");
-        }
-        this.rel_id = id;
-        this.name = name;
+    public Relative() {
+        super();
+    }
+
+    public Relative(String name, String relationship, String phoneNumber, String gender) {
+        super(name);
         this.relationship = relationship;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
         num_of_relatives++;
     }
 
-    public int getRel_id() {
-        return rel_id;
-    }
-
-    public void setRel_id(int rel_id) {
-        this.rel_id = rel_id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getRelationship() {
         return relationship;
@@ -141,11 +121,16 @@ public class Relative implements Serializable {
 
     @Override
     public String toString() {
-        return "Relatives [rel_id=" + rel_id + ", name=" + name + ", relationship=" + relationship + 
-               ", description=" + description + ", phoneNumber=" + phoneNumber + ", email=" + email +
-                ", gender=" + gender                                    
-                + ", address=" + address + ", birthday=" + (birthday != null ? birthday.toString() : "null") +
-             ", mediaList=" + mediaList + "]";
-    }         
-
+        return "Relative{" + super.toString()+
+                "relationship='" + relationship + '\'' +
+                ", description='" + description + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", gender='" + gender + '\'' +
+                ", address='" + address + '\'' +
+                ", photoPath='" + photoPath + '\'' +
+                ", mediaList=" + mediaList +
+                ", birthday=" + birthday +
+                '}';
+    }
 }

@@ -3,6 +3,7 @@ public class Caregiver extends User implements Searchable{
     private Patient patient;
 
     public Caregiver(){
+        super();
     }
 
     public Caregiver(String name, String email, String password) {

@@ -7,6 +7,7 @@ public class Patient extends User implements Searchable{
     private ArrayList<Reminder> reminders;
 
     public Patient() {
+        super();
     }
 
     public Patient(String name, String email, String password, String patientStage) {

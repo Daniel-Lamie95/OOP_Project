@@ -4,6 +4,7 @@ public abstract class User extends Person {
     private String password;
 
     public User() {
+        super();
     }
 
     public User(String name, String email, String password) {

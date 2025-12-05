@@ -5,6 +5,7 @@ public abstract class Person {
     private String name;
 
     public Person() {
+        this.id=UUID.randomUUID();
     }
 
     public Person(String name) {
