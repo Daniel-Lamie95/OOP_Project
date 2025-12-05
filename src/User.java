@@ -1,5 +1,9 @@
+import java.io.Serializable;
 import java.util.UUID;
-public abstract class User extends Person {
+
+public abstract class User extends Person implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String email;
     private String password;
 
@@ -12,7 +16,7 @@ public abstract class User extends Person {
         this.password = password;
     }
 
-    public User(String name,UUID id, String email, String password) {
+    public User(String name, UUID id, String email, String password) {
         super(name, id);
         this.email = email;
         this.password = password;
@@ -33,12 +37,4 @@ public abstract class User extends Person {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    //public boolean checkInfo(String email, String password) {
-    //    if (email == null || password == null) {
-    //        return false;
-     //   }
-     //  return this.email.equals(email) && this.password.equals(password);
-   // }
-
 }

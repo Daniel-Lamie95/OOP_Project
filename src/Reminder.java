@@ -1,7 +1,10 @@
+import java.io.Serializable;
 import java.util.UUID;
 import java.time.LocalDateTime;
-public class Reminder extends PatientInfo{
+import java.io.Serializable;
 
+
+public class Reminder extends PatientInfo implements Serializable {
     private String description;
     private LocalDateTime dateOfReminder;
     private Boolean isDone = false;

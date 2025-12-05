@@ -98,7 +98,7 @@ public class Main extends Application {
             updateRelativesList();
 
             // Create memory with media
-            Memory m1 = new Memory(UUID.randomUUID(), "Beach Trip");
+            Memory m1 = new Memory(UUID.randomUUID(),"Beach Trip");
             m1.setDescription("A happy day at the beach");
             m1.setDate(new Date());
             Media photo = new Media("/path/to/photo.jpg", "photo", "beach.jpg");

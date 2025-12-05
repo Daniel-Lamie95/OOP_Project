@@ -1,7 +1,10 @@
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.Objects;
+import java.io.Serializable;
 
-public class Media{
+
+public class Media implements Serializable {
     private UUID id;
     private String mediaPath;
     private String mediaType;

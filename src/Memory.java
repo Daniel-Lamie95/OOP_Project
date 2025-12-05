@@ -1,19 +1,18 @@
+import java.io.Serializable;
 import java.util.*;
 
-public class Memory extends PatientInfo {
+public class Memory extends PatientInfo implements Serializable{
     private String description;
     private Date date = new Date();
     private List<Relative> relatives = new ArrayList<>();
     private List<Media> mediaList = new ArrayList<>();
 
-    public Memory(UUID id, String name) {
-        super(id, name);
-    }
-
     public Memory(UUID id, String name, String description, Date date, List<Relative> relatives, List<Media> mediaList) {
         super(id, name);
         this.description = description == null ? "" : description;
-        setDate(date); // use setter to enforce non-null past date
+        setDate(date);
+        this.relatives = relatives;
+        this.mediaList = mediaList;
     }
 
     @Override
@@ -145,11 +144,15 @@ public class Memory extends PatientInfo {
     @Override
     public String toString() {
         return "Memory{" +
-                "name='" + getName() + '\'' +
+                "id=" + getId() +
+                ", name='" + getName() + '\'' +
                 ", description='" + description + '\'' +
-                ", date=" + (getDate()) +
+                ", date=" + date +
+                ", relatives=" + relatives +
+                ", mediaList=" + mediaList +
                 '}';
     }
+
 
 
 }
