@@ -1,4 +1,3 @@
-import java.util.UUID;
 public interface Searchable {
     Memory findMemory(String name);
     Reminder findReminder(String name);
