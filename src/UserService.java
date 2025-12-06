@@ -1,5 +1,6 @@
+import java.io.Serializable;
 import java.util.ArrayList;
-public abstract class UserService{
+public abstract class UserService implements Serializable {
     protected ArrayList<User> users = new ArrayList<>();
 
     public UserService(ArrayList<User> users) {

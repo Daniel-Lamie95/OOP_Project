@@ -1,5 +1,6 @@
+import java.io.Serializable;
 import java.util.UUID;
-public abstract class Person {
+public abstract class Person implements Serializable {
     private UUID id;
     private String name;
 

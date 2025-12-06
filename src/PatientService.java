@@ -1,5 +1,6 @@
+import java.io.Serializable;
 import java.util.ArrayList;
-public class PatientService extends UserService {
+public class PatientService extends UserService implements Serializable {
 
     public PatientService(ArrayList<User> users) {
         super(users);
