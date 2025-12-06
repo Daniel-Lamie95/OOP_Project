@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 
 public class Reminder extends PatientInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String description;
     private LocalDateTime dateOfReminder;
     private Boolean isDone = false;

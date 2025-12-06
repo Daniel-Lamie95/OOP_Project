@@ -2,6 +2,7 @@ import java.io.Serializable;
 import java.util.UUID;
 import java.io.Serializable;
 public abstract class User extends Person implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String email;
     private String password;
 

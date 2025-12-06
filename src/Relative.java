@@ -14,7 +14,6 @@ public class Relative extends Person implements Serializable {
     private String photoPath;
     private List<Media> mediaList = new ArrayList<>();
     private static int num_of_relatives = 0;
-
     private LocalDate birthday;
 
     public Relative() {
