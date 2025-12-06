@@ -49,7 +49,6 @@ public abstract class User extends Person implements Serializable {
     public String toString() {
         return "User{" +
                 "email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 }

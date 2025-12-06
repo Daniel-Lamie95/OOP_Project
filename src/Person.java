@@ -1,4 +1,3 @@
-
 import java.util.UUID;
 public abstract class Person {
     private UUID id;
@@ -27,6 +26,5 @@ public abstract class Person {
     public void setName(String name) {
         this.name = name;
     }
-
 
 }

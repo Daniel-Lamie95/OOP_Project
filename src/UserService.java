@@ -20,7 +20,7 @@ public abstract class UserService{
        return true;
    }
 
-    public User login(String name,String email, String password) {
+    public User login(String email, String password) {
         for (User u : users) {
             if (u.checkInfo(email, password)) {
                 return u;

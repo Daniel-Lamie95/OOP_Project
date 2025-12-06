@@ -19,7 +19,6 @@ public class Caregiver extends User implements Searchable, Serializable{
     }
 
     public Patient getPatient() {
-
         return patient;
     }
 
@@ -29,15 +28,15 @@ public class Caregiver extends User implements Searchable, Serializable{
 
     public void addPatient(Patient p) throws Exception {
         if(this.patient != null){
-            throw new Exception("patient is null");}
+            throw new Exception("caregiver already has a patient");}
         else {
             this.patient = p;
         }
     }
 
-    public void deletePatient(String id) throws Exception{
+    public void deletePatient(String name) throws Exception{
         if (patient == null)
-            throw new Exception("patient is null");
+            throw new Exception("no patient was found");
         else {
             patient=null;
         }
@@ -45,42 +44,51 @@ public class Caregiver extends User implements Searchable, Serializable{
 
     public void editPatient(String name, String patientStage)  throws Exception{
         if (this.patient == null)
-            throw new Exception("patient is null");
-        this.patient.setName(name);
-        this.patient.setPatientStage(patientStage);
+            throw new Exception("no patient was found");
+        else {
+            this.patient.setName(name);
+            this.patient.setPatientStage(patientStage);
+        }
     }
 
     public void addMemory(Memory m) throws Exception{
         if (this.patient == null)
-            throw new Exception("patient is null");
+            throw new Exception("no patient was found");
         else{
             this.patient.addMemories(m);
         }
     }
 
-    public void deleteMemory(String  name) throws Exception {
+    public void deleteMemory(String name) throws Exception {
         if (this.patient == null)
-            throw new Exception("patient is null");
+            throw new Exception("no patient was found");
         else {
-            this.patient.deleteMemory(name);
+            Memory m = findMemory(name);
+            if (m == null)
+                throw new Exception("no memory was found");
+            else {
+                this.patient.deleteMemory(name);
+            }
         }
     }
 
     public void editMemory(String memoryName,String newMemoryName,String description ) throws Exception {
         if (this.patient == null)
-            throw new Exception("patient is null");
+            throw new Exception("no patient was found");
         else {
             Memory m = findMemory(memoryName);
             if (m == null)
-                throw new Exception("memories not found");
-            m.setName(newMemoryName);
-            m.setDescription(description);
+                throw new Exception("no memory was found");
+            else {
+                m.setName(newMemoryName);
+                m.setDescription(description);
+            }
         }
     }
 
     public void addReminder(Reminder r) throws Exception {
         if (patient == null)
-            throw new Exception("patient is null");
+            throw new Exception("no patient was found");
         else {
             patient.addReminder(r);
         }
@@ -88,24 +96,34 @@ public class Caregiver extends User implements Searchable, Serializable{
 
     public void deleteReminder(String name) throws Exception{
         if (patient == null)
-            throw new Exception("patient is null");
+            throw new Exception("no patient was found");
         else {
-            patient.deleteReminder(name);
-
+            Reminder r = findReminder(name);
+            if (r == null)
+                throw new Exception("no reminder was found");
+            else {
+                patient.deleteReminder(name);
+            }
         }
     }
 
     public void editReminder(String oldName, String newName, String description) throws Exception {
-        Reminder r = findReminder(oldName);
-        if (r == null)
-            throw new Exception("patient is null");
-        r.setName(newName);
-        r.setDescription(description);
-
+        if (this.patient == null)
+            throw new Exception("no patient was found");
+        else{
+            Reminder r = findReminder(oldName);
+            if(r == null)
+                throw new Exception("no reminder was found");
+            else {
+                r.setName(newName);
+                r.setDescription(description);
+            }
+        }
     }
+
     public void addRelative(Relative re) throws Exception{
             if (patient == null)
-                throw new Exception("patient is null");
+                throw new Exception("no patient was found");
             else {
                 patient.addRelatives(re);
             }
@@ -113,30 +131,41 @@ public class Caregiver extends User implements Searchable, Serializable{
 
     public void deleteRelative(String name) throws Exception{
         if (patient == null)
-            throw new Exception("patient is null");
+            throw new Exception("no patient was found");
         else {
-            patient.deleteRelative(name);
-
+            Relative re = findRelative(name);
+            if (re == null)
+                throw new Exception("no relative was found");
+            else {
+                patient.deleteRelative(name);
+            }
         }
     }
 
-    public void editRelative( String name,String relationship, String description, String phoneNumber, String email, String gender, String address, String photoPath) throws Exception{
-       Relative re=findRelative(name);
-        if (re == null)
-            throw new Exception("relative is null");
+    public void editRelative( String name,String relationship, String description, String phoneNumber,
+                              String email, String gender, String address, String photoPath) throws Exception{
+        if (this.patient == null)
+            throw new Exception("no patient was found");
         else{
-            re.setRelationship(relationship);
-            re.setDescription(description);
-            re.setPhoneNumber(phoneNumber);
-            re.setEmail(email);
-            re.setGender(gender);
-            re.setAddress(address);
-            re.setPhotoPath(photoPath);
+            Relative re=findRelative(name);
+            if (re == null)
+                throw new Exception("no relative was found");
+            else{
+                re.setRelationship(relationship);
+                re.setDescription(description);
+                re.setPhoneNumber(phoneNumber);
+                re.setEmail(email);
+                re.setGender(gender);
+                re.setAddress(address);
+                re.setPhotoPath(photoPath);
+            }
         }
     }
 
     @Override
     public Memory findMemory(String memoryName) {
+        if (patient == null || patient.getMemories() == null)
+            return null;
         for (Memory m :  patient.getMemories())
             if (m.getName().equals(memoryName))
                 return m;
@@ -145,7 +174,8 @@ public class Caregiver extends User implements Searchable, Serializable{
 
     @Override
     public Reminder findReminder(String name) {
-
+        if (patient == null || patient.getReminders() == null)
+            return null;
         for (Reminder r : patient.getReminders())
             if (r.getName().equals(name))
                 return r;
@@ -154,6 +184,8 @@ public class Caregiver extends User implements Searchable, Serializable{
 
     @Override
     public Relative findRelative(String name) {
+        if (patient == null || patient.getRelatives() == null)
+            return null;
         for (Relative rel : patient.getRelatives())
             if (rel.getName().equals(name))
                 return rel;
