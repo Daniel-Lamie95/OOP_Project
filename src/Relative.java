@@ -5,6 +5,7 @@ import java.util.List;
 import java.time.LocalDate;
 
 public class Relative extends Person implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String relationship;
     private String description;
     private String phoneNumber;

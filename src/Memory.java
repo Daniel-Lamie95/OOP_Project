@@ -2,6 +2,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Memory extends PatientInfo implements Serializable{
+    private static final long serialVersionUID = 1L;
     private String description;
     private Date date = new Date();
     private List<Relative> relatives = new ArrayList<>();
