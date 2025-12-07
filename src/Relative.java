@@ -1,4 +1,3 @@
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,25 @@ public class Relative extends Person implements Serializable {
         this.relationship = relationship;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
+        num_of_relatives++;
+    }
+
+    // Full constructor to support UI flows that collect more fields
+    public Relative(String name, String relationship, String description, String phoneNumber,
+                    String email, String gender, String address, String photoPath, LocalDate birthday) {
+        super(name);
+        this.relationship = relationship;
+        this.description = description == null ? "" : description;
+        this.phoneNumber = phoneNumber;
+        this.email = email == null ? "" : email;
+        this.gender = gender == null ? "" : gender;
+        this.address = address == null ? "" : address;
+        if (photoPath != null && !photoPath.trim().isEmpty()) {
+            this.photoPath = photoPath;
+        } else {
+            this.photoPath = null; // leave null until setPhotoPath is called
+        }
+        this.birthday = birthday;
         num_of_relatives++;
     }
 
