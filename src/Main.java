@@ -36,38 +36,28 @@ public class Main extends Application {
     }
 
     private Scene createLoginScene() {
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
-        Label lblTitle = new Label("Login");
-        lblTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        // Form controls and existing logic kept exactly the same
+        Label lblTitle = new Label("Welcome to MemoraCare");
+        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#124daa;");
 
         Label lblEmail = new Label("Email:");
         TextField tfEmail = new TextField();
+        tfEmail.setPromptText("you@example.com");
         Label lblPassword = new Label("Password:");
         PasswordField pf = new PasswordField();
+        pf.setPromptText("Enter password");
+
+        // Keep the logical roleChoice but we'll present ToggleButtons that sync to it
         ChoiceBox<String> roleChoice = new ChoiceBox<>(FXCollections.observableArrayList("Caregiver", "Patient"));
         roleChoice.setValue("Caregiver");
+        roleChoice.setVisible(false); roleChoice.setManaged(false);
 
         Button btnLogin = new Button("Login");
         Button btnRefresh = new Button("Reload accounts");
         Button btnSignUpCaregiver = new Button("Sign up (Caregiver)");
         Label status = new Label();
 
-        // place controls
-        grid.add(lblTitle, 0, 0, 2, 1);
-        grid.add(new Label("Role:"), 0, 1);
-        grid.add(roleChoice, 1, 1);
-        grid.add(lblEmail, 0, 2);
-        grid.add(tfEmail, 1, 2);
-        grid.add(lblPassword, 0, 3);
-        grid.add(pf, 1, 3);
-        HBox btns = new HBox(10, btnLogin, btnRefresh, btnSignUpCaregiver);
-        grid.add(btns, 1, 4);
-        grid.add(status, 0, 5, 2, 1);
-
+        // keep original button logic exactly
         btnLogin.setOnAction(e -> {
             String email = tfEmail.getText().trim();
             String pass = pf.getText();
@@ -99,7 +89,204 @@ public class Main extends Application {
 
         btnSignUpCaregiver.setOnAction(e -> showSignUpCaregiverDialog());
 
-        return new Scene(grid);
+        // Build a polished UI: left image/branding and right card form
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(20));
+        root.setStyle("-fx-background-color: linear-gradient(#f6fbff, #eaf3ff);");
+
+        // Left branding area kept as a subtle panel (can be removed/tweaked)
+        VBox leftBox = new VBox(12);
+        leftBox.setAlignment(Pos.CENTER);
+        leftBox.setPadding(new Insets(10));
+        leftBox.setStyle("-fx-background-color: transparent;");
+
+        ImageView sideLogo = new ImageView();
+        // Load the provided logo into the left branding panel and make it larger for balance
+        try {
+            String logoPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/WhatsApp Image 2025-12-08 at 02.09.15_16f50d91.jpg";
+            javafx.scene.image.Image img = new javafx.scene.image.Image(logoPath);
+            sideLogo.setImage(img);
+            // slightly smaller for a more balanced layout
+            sideLogo.setFitWidth(380);
+            sideLogo.setPreserveRatio(true);
+            sideLogo.setSmooth(true);
+        } catch (Exception ignore) {
+            // fallback sizing if image fails
+            sideLogo.setFitWidth(300);
+            sideLogo.setPreserveRatio(true);
+        }
+        leftBox.getChildren().addAll(sideLogo);
+
+        // Right card form
+        VBox card = new VBox(12);
+        card.setPadding(new Insets(24));
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setStyle("-fx-background-color: white; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 12, 0.2, 0, 4);");
+
+        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#124daa;");
+        Label subtitle = new Label("Choose Account Type");
+        subtitle.setStyle("-fx-text-fill: #5b82c9; -fx-font-weight:600;");
+
+        // Role toggle buttons (styled as bar buttons) that sync with roleChoice
+        ToggleGroup tg = new ToggleGroup();
+        ToggleButton tbCare = new ToggleButton("Caregiver");
+        ToggleButton tbPatient = new ToggleButton("Patient");
+        // Prepare ImageView placeholders so we can modify their effects on hover/select
+        ImageView careIv = new ImageView();
+        ImageView patientIv = new ImageView();
+        // Load role icons and put them above the button text (TOP)
+        try {
+            String careIconPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/7051035.png";
+            javafx.scene.image.Image careImg = new javafx.scene.image.Image(careIconPath);
+            careIv.setImage(careImg);
+            careIv.setFitWidth(86);
+            careIv.setPreserveRatio(true);
+            careIv.setSmooth(true);
+            tbCare.setGraphic(careIv);
+            tbCare.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
+        } catch (Exception ignore) { /* ignore icon load */ }
+        try {
+            String patientIconPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/tax-inspector.png";
+            javafx.scene.image.Image patientImg = new javafx.scene.image.Image(patientIconPath);
+            patientIv.setImage(patientImg);
+            patientIv.setFitWidth(86);
+            patientIv.setPreserveRatio(true);
+            patientIv.setSmooth(true);
+            tbPatient.setGraphic(patientIv);
+            tbPatient.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
+        } catch (Exception ignore) { /* ignore icon load */ }
+        tbCare.setToggleGroup(tg); tbPatient.setToggleGroup(tg);
+        tbCare.setSelected(true);
+        // selected / unselected styles (selected shows a highlighted border)
+        String selStyle = "-fx-background-color: linear-gradient(#2b6ff6, #1f66d6); -fx-text-fill: white; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18; -fx-border-color:#1f66d6; -fx-border-width:2; -fx-border-radius:8;";
+        String unselStyle = "-fx-background-color: white; -fx-border-color:#cfe4ff; -fx-text-fill:#2b6ff6; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18;";
+        tbCare.setStyle(selStyle);
+        tbPatient.setStyle(unselStyle);
+        tbCare.setPrefWidth(150); tbPatient.setPrefWidth(150);
+
+        // Create reusable effects for icon tinting
+        javafx.scene.effect.DropShadow hoverShadowCare = new javafx.scene.effect.DropShadow(12, javafx.scene.paint.Color.web("#2b6ff6"));
+        javafx.scene.effect.DropShadow hoverShadowPatient = new javafx.scene.effect.DropShadow(12, javafx.scene.paint.Color.web("#2b6ff6"));
+        javafx.scene.effect.DropShadow selectedShadow = new javafx.scene.effect.DropShadow(18, javafx.scene.paint.Color.web("#1f66d6"));
+        // stronger blue tint on hover/selected: shift hue toward blue and increase saturation
+        javafx.scene.effect.ColorAdjust hoverColorAdjust = new javafx.scene.effect.ColorAdjust();
+        hoverColorAdjust.setHue(0.18);   // small hue shift toward blue
+        hoverColorAdjust.setSaturation(0.45);
+        hoverColorAdjust.setBrightness(0.02);
+        // chain the color adjust under the drop shadow so the icon glows blue
+        hoverShadowCare.setInput(hoverColorAdjust);
+        hoverShadowPatient.setInput(hoverColorAdjust);
+        selectedShadow.setInput(hoverColorAdjust);
+
+        // Sync toggle selection with roleChoice value and update styles and icon effects
+        tg.selectedToggleProperty().addListener((obs, oldT, newT) -> {
+            if (newT == tbCare) {
+                roleChoice.setValue("Caregiver");
+                tbCare.setStyle(selStyle);
+                tbPatient.setStyle(unselStyle);
+                // apply selected effect to care icon and clear patient icon effect
+                careIv.setEffect(selectedShadow);
+                patientIv.setEffect(null);
+            } else if (newT == tbPatient) {
+                roleChoice.setValue("Patient");
+                tbPatient.setStyle(selStyle);
+                tbCare.setStyle(unselStyle);
+                patientIv.setEffect(selectedShadow);
+                careIv.setEffect(null);
+            }
+        });
+
+        // Hover behaviour: stronger visual feedback + blue tint glow on the icon
+        tbCare.setOnMouseEntered(evt -> {
+            if (!tbCare.isSelected()) {
+                tbCare.setStyle(unselStyle + " -fx-effect: dropshadow(gaussian, rgba(47,111,246,0.22), 10, 0.2, 0, 3);");
+                careIv.setEffect(hoverShadowCare);
+            }
+        });
+        tbCare.setOnMouseExited(evt -> {
+            if (!tbCare.isSelected()) {
+                tbCare.setStyle(unselStyle);
+                careIv.setEffect(null);
+            }
+        });
+        tbPatient.setOnMouseEntered(evt -> {
+            if (!tbPatient.isSelected()) {
+                tbPatient.setStyle(unselStyle + " -fx-effect: dropshadow(gaussian, rgba(47,111,246,0.22), 10, 0.2, 0, 3);");
+                patientIv.setEffect(hoverShadowPatient);
+            }
+        });
+        tbPatient.setOnMouseExited(evt -> {
+            if (!tbPatient.isSelected()) {
+                tbPatient.setStyle(unselStyle);
+                patientIv.setEffect(null);
+            }
+        });
+
+        // Also ensure clicking the buttons themselves sets the toggle selection and styles (keeps logic consistent)
+        tbCare.setOnAction(evt -> {
+            tbCare.setSelected(true); roleChoice.setValue("Caregiver"); tbCare.setStyle(selStyle); tbPatient.setStyle(unselStyle);
+            careIv.setEffect(selectedShadow); patientIv.setEffect(null);
+        });
+        tbPatient.setOnAction(evt -> {
+            tbPatient.setSelected(true); roleChoice.setValue("Patient"); tbPatient.setStyle(selStyle); tbCare.setStyle(unselStyle);
+            patientIv.setEffect(selectedShadow); careIv.setEffect(null);
+        });
+
+        HBox roleBar = new HBox(12, tbCare, tbPatient);
+        roleBar.setAlignment(Pos.CENTER);
+
+        // Inputs
+        tfEmail.setPrefWidth(340);
+        pf.setPrefWidth(340);
+        tfEmail.setStyle("-fx-background-radius:6; -fx-border-radius:6; -fx-padding:8; -fx-border-color: #cfe4ff;");
+        pf.setStyle("-fx-background-radius:6; -fx-border-radius:6; -fx-padding:8; -fx-border-color: #cfe4ff;");
+
+        Label emailLabel = new Label("Email"); emailLabel.setStyle("-fx-text-fill:#6b87b7;");
+        Label passLabel = new Label("Password"); passLabel.setStyle("-fx-text-fill:#6b87b7;");
+
+        Button loginPrimary = new Button("Login");
+        loginPrimary.setStyle("-fx-background-color: linear-gradient(#2b6ff6, #1f66d6); -fx-text-fill: white; -fx-padding:8 20; -fx-background-radius:8;");
+        Button signupLink = new Button("Signup");
+        signupLink.setStyle("-fx-background-color: transparent; -fx-text-fill:#2b6ff6; -fx-underline:true; -fx-padding:6 10; -fx-font-weight:600;");
+
+        // wire our visible primary login button to the same logic as btnLogin
+        loginPrimary.setOnAction(btnLogin.getOnAction());
+
+        // We'll show the secondary controls in a compact footer row
+        HBox footerRow = new HBox(12);
+        footerRow.setAlignment(Pos.CENTER_LEFT);
+        Label noAcc = new Label("No account?"); noAcc.setStyle("-fx-text-fill:#7e98c9;");
+        footerRow.getChildren().addAll(noAcc, signupLink);
+
+        // signupLink triggers the original sign-up dialog
+        signupLink.setOnAction(btnSignUpCaregiver.getOnAction());
+
+        // place original hidden roleChoice in scene graph so logic stays intact
+        VBox hidden = new VBox(roleChoice); hidden.setVisible(false); hidden.setManaged(false);
+
+        // Layout assemble: title, subtitle, roleBar, form fields, login button, and status
+        // (logo is now shown on the left side for better balance)
+        card.getChildren().addAll(lblTitle, subtitle, roleBar, emailLabel, tfEmail, passLabel, pf, loginPrimary, footerRow, status, hidden);
+
+        // Layout: put left branding and right card side-by-side centered
+        HBox center = new HBox(28);
+        center.setAlignment(Pos.CENTER);
+        center.getChildren().addAll(leftBox, card);
+
+        HBox.setHgrow(leftBox, Priority.ALWAYS);
+        leftBox.setPrefWidth(360);
+        card.setPrefWidth(420);
+
+        root.setCenter(center);
+
+        // bottom small footer
+        Label footer = new Label("© MemoraCare");
+        footer.setStyle("-fx-text-fill: #666;");
+        BorderPane.setAlignment(footer, Pos.CENTER);
+        root.setBottom(footer);
+
+        Scene scene = new Scene(root);
+        return scene;
     }
 
     private void showCaregiverDashboard(Caregiver caregiver) {
@@ -704,6 +891,17 @@ public class Main extends Application {
     private void showSignUpCaregiverDialog() {
         Dialog<ButtonType> dlg = new Dialog<>();
         dlg.setTitle("Sign up - Caregiver");
+
+        // header graphic (small logo) to match login theme
+        try {
+            String logoPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/WhatsApp Image 2025-12-08 at 02.09.15_16f50d91.jpg";
+            javafx.scene.image.Image lg = new javafx.scene.image.Image(logoPath);
+            ImageView headerLogo = new ImageView(lg);
+            headerLogo.setFitWidth(64);
+            headerLogo.setPreserveRatio(true);
+            dlg.getDialogPane().setGraphic(headerLogo);
+        } catch (Exception ignore) { /* ignore image load problems */ }
+
         GridPane g = new GridPane(); g.setHgap(8); g.setVgap(8);
         TextField tfName = new TextField(); tfName.setPromptText("Name");
         TextField tfEmail = new TextField(); tfEmail.setPromptText("Email");
@@ -711,9 +909,33 @@ public class Main extends Application {
         g.add(new Label("Name:"),0,0); g.add(tfName,1,0);
         g.add(new Label("Email:"),0,1); g.add(tfEmail,1,1);
         g.add(new Label("Password:"),0,2); g.add(pf,1,2);
+
+        // Apply theme styles to the dialog pane and inputs so it matches the login screen
         dlg.getDialogPane().setContent(g);
+        dlg.getDialogPane().setStyle("-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding:14;");
+        dlg.getDialogPane().setPrefWidth(440);
+
+        // color all labels inside the grid to match theme
+        for (javafx.scene.Node node : g.getChildren()) {
+            if (node instanceof Label) {
+                ((Label) node).setStyle("-fx-text-fill:#6b87b7; -fx-font-weight:600;");
+            }
+        }
+        // style inputs
+        tfName.setStyle("-fx-border-color:#cfe4ff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
+        tfEmail.setStyle("-fx-border-color:#cfe4ff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
+        pf.setStyle("-fx-border-color:#cfe4ff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
+
+        // Add the standard dialog buttons
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
+        // Style the OK / Cancel buttons to match theme
+        javafx.scene.control.Button okBtn = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
+        javafx.scene.control.Button cancelBtn = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.CANCEL);
+        if (okBtn != null) okBtn.setStyle("-fx-background-color: linear-gradient(#2b6ff6, #1f66d6); -fx-text-fill: white; -fx-background-radius:6; -fx-padding:6 14;");
+        if (cancelBtn != null) cancelBtn.setStyle("-fx-background-color: transparent; -fx-text-fill:#2b6ff6; -fx-padding:6 10; -fx-underline:true;");
+
+        // Keep original OK handling logic exactly as before
         Optional<ButtonType> res = dlg.showAndWait();
         if (res.isPresent() && res.get() == ButtonType.OK) {
             String name = tfName.getText().trim();
@@ -990,7 +1212,6 @@ public class Main extends Application {
             dq.add(root);
             while (!dq.isEmpty()) {
                 javafx.scene.Node n = dq.removeFirst();
-                // If it's a Label with the associate-relatives text, look for a sibling ListView in its parent VBox
                 if (n instanceof Label) {
                     String txt = ((Label) n).getText();
                     if (txt != null && txt.startsWith("Associate relatives")) {
@@ -1003,11 +1224,7 @@ public class Main extends Application {
                                     try {
                                         list.getItems().clear();
                                         Patient p = caregiver == null ? null : caregiver.getPatient();
-                                        if (p != null) {
-                                            for (Relative r : p.getRelatives()) {
-                                                list.getItems().add(r);
-                                            }
-                                        }
+                                        if (p != null) for (Relative r : p.getRelatives()) list.getItems().add(r);
                                     } catch (Exception ignore) { /* ignore UI refresh issues */ }
                                 }
                             }
