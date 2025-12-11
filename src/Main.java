@@ -87,7 +87,7 @@ public class Main extends Application {
             status.setText("Accounts reloaded (on next action).");
         });
 
-        btnSignUpCaregiver.setOnAction(e -> showSignUpCaregiverDialog());
+        btnSignUpCaregiver.setOnAction(e -> showCaregiverDashboard());
 
         // Build a polished UI: left image/branding and right card form
         BorderPane root = new BorderPane();
