@@ -1003,7 +1003,6 @@ public class Main extends Application {
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 900, 600);
         primaryStage.setScene(scene);
-
         // Main content: stacked sections
         VBox centerContent = new VBox(20);
         centerContent.setPadding(new Insets(20));
@@ -1212,40 +1211,40 @@ public class Main extends Application {
         List<Relative> relList = patient.getRelatives() == null ? Collections.emptyList() : new ArrayList<>(patient.getRelatives());
         for (Relative r : relList) {
             final Relative rel = r; // final copy for lambda usage
-             VBox card = new VBox(6);
-             card.setPadding(new Insets(10));
-             card.setPrefWidth(160);
-             card.setAlignment(Pos.TOP_CENTER);
-             card.setStyle("-fx-background-color: #F5F5DC; -fx-background-radius: 8;");
- 
-             ImageView iv = new ImageView();
-             try {
+            VBox card = new VBox(6);
+            card.setPadding(new Insets(10));
+            card.setPrefWidth(160);
+            card.setAlignment(Pos.TOP_CENTER);
+            card.setStyle("-fx-background-color: #F5F5DC; -fx-background-radius: 8;");
+
+            ImageView iv = new ImageView();
+            try {
                 String p = null;
                 try { p = rel.getPhotoPath(); } catch (Exception ignored) {}
                 if (p != null && new File(p).exists()) {
                     Image img = new Image(new File(p).toURI().toString(), 80, 80, true, true);
                     iv.setImage(img);
                 }
-             } catch (Exception ignore) {}
-             iv.setFitWidth(80);
-             iv.setFitHeight(80);
-             Circle clip = new Circle(40, 40, 40);
-             iv.setClip(clip);
- 
-             Label name = new Label(rel == null ? "Relative" : safeString(rel.getName()));
-             name.setStyle("-fx-font-weight: bold;");
-             Label relation = new Label(rel == null ? "" : safeString(rel.getRelationship()));
-             relation.setStyle("-fx-font-size: 12px; -fx-text-fill: #555;");
- 
-             card.getChildren().addAll(iv, name, relation);
- 
-             // show full contact info popup
-             card.setOnMouseClicked(evt -> {
-                 showRelativeDetailsDialog(rel);
-             });
- 
-             relativesHBox.getChildren().add(card);
-         }
+            } catch (Exception ignore) {}
+            iv.setFitWidth(80);
+            iv.setFitHeight(80);
+            Circle clip = new Circle(40, 40, 40);
+            iv.setClip(clip);
+
+            Label name = new Label(rel == null ? "Relative" : safeString(rel.getName()));
+            name.setStyle("-fx-font-weight: bold;");
+            Label relation = new Label(rel == null ? "" : safeString(rel.getRelationship()));
+            relation.setStyle("-fx-font-size: 12px; -fx-text-fill: #555;");
+
+            card.getChildren().addAll(iv, name, relation);
+
+            // show full contact info popup
+            card.setOnMouseClicked(evt -> {
+                showRelativeDetailsDialog(rel);
+            });
+
+            relativesHBox.getChildren().add(card);
+        }
         relativesSection.getChildren().addAll(relTitle, relScrollPane);
         centerContent.getChildren().add(relativesSection);
 
@@ -1395,4 +1394,3 @@ public class Main extends Application {
         launch(args);
     }
 }
-
