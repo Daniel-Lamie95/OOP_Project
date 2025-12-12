@@ -1,7 +1,6 @@
 import java.io.Serializable;
 import java.util.UUID;
 import java.time.LocalDateTime;
-import java.io.Serializable;
 
 
 public class Reminder extends PatientInfo implements Serializable {
