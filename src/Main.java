@@ -30,7 +30,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        primaryStage.setTitle("Alzheimer Helper");
+        primaryStage.setTitle("MemoraCare");
 
         loginScene = createLoginScene();
 
@@ -43,7 +43,7 @@ public class Main extends Application {
     private Scene createLoginScene() {
         // Form controls and existing logic kept exactly the same
         Label lblTitle = new Label("Welcome to MemoraCare");
-        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#124daa;");
+        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#6b5146;");
 
         Label lblEmail = new Label("Email:");
         TextField tfEmail = new TextField();
@@ -97,12 +97,14 @@ public class Main extends Application {
         // Build a polished UI: left image/branding and right card form
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: linear-gradient(#f6fbff, #eaf3ff);");
+        // use a warm, neutral background to match the logo's palette
+        root.setStyle("-fx-background-color: linear-gradient(#fbf8f6, #f2ebe6);");
 
-        // Left branding area kept as a subtle panel (can be removed/tweaked)
+        // Left branding area: top-aligned so the logo lines up with the top of the login card
         VBox leftBox = new VBox(12);
-        leftBox.setAlignment(Pos.CENTER);
-        leftBox.setPadding(new Insets(10));
+        leftBox.setAlignment(Pos.TOP_LEFT);
+        // reduce left box width a bit and remove bottom padding; we'll nudge the logo into the card area
+        leftBox.setPadding(new Insets(10, 0, 0, 0));
         leftBox.setStyle("-fx-background-color: transparent;");
 
         ImageView sideLogo = new ImageView();
@@ -111,26 +113,48 @@ public class Main extends Application {
             String logoPath = "file:media/logo.jpg";
             javafx.scene.image.Image img = new javafx.scene.image.Image(logoPath);
             sideLogo.setImage(img);
-            // slightly smaller for a more balanced layout
-            sideLogo.setFitWidth(380);
+            // make the polaroid a bit larger per request (centered and slightly bigger)
+            sideLogo.setFitWidth(320);
             sideLogo.setPreserveRatio(true);
             sideLogo.setSmooth(true);
+            // we'll center it vertically and nudge right so about half sits over the card's inner empty area
+            sideLogo.setTranslateX(40);
+            sideLogo.setTranslateY(0);
         } catch (Exception ignore) {
             // fallback sizing if image fails
-            sideLogo.setFitWidth(300);
+            sideLogo.setFitWidth(320);
             sideLogo.setPreserveRatio(true);
         }
-        leftBox.getChildren().addAll(sideLogo);
+        // don't add the image as a child of leftBox — we'll layer it above the card so it appears on top
+        // reserve left box width so the layout keeps the same spacing
+        leftBox.setPrefWidth(260);
 
-        // Right card form
-        VBox card = new VBox(12);
-        card.setPadding(new Insets(24));
-        card.setAlignment(Pos.TOP_CENTER);
-        card.setStyle("-fx-background-color: white; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 12, 0.2, 0, 4);");
+        // Right card form (outer beige card). Inside it we'll place a left empty area and a white inner form pane
+        VBox outerCard = new VBox();
+        outerCard.setPadding(new Insets(12));
+        outerCard.setAlignment(Pos.TOP_CENTER);
+        outerCard.setStyle("-fx-background-color: white; -fx-border-radius:18; -fx-background-radius:18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0.12, 0, 6);");
 
-        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#124daa;");
+        // Inner HBox: left empty pane (where logo should align) + right white form pane
+        HBox inner = new HBox();
+        inner.setAlignment(Pos.TOP_LEFT);
+
+        // left empty area inside the card (transparent surface) - logo will visually sit over this area
+        Region innerLeft = new Region();
+        // set this so roughly half (or slightly less) of the logo sits on the empty side
+        innerLeft.setPrefWidth(140);
+
+        // white form pane that contains the inputs and controls
+        VBox formPane = new VBox(12);
+        formPane.setPadding(new Insets(18));
+        formPane.setAlignment(Pos.TOP_CENTER);
+        formPane.setStyle("-fx-background-color: white; -fx-border-radius: 12; -fx-background-radius: 12;");
+        // make the white form slightly narrower to balance with the empty area
+        formPane.setPrefWidth(360);
+
+        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#6b5146;");
         Label subtitle = new Label("Choose Account Type");
-        subtitle.setStyle("-fx-text-fill: #5b82c9; -fx-font-weight:600;");
+        subtitle.setStyle("-fx-text-fill: #8b6a57; -fx-font-weight:600;");
 
         // Role toggle buttons (styled as bar buttons) that sync with roleChoice
         ToggleGroup tg = new ToggleGroup();
@@ -163,20 +187,22 @@ public class Main extends Application {
         tbCare.setToggleGroup(tg); tbPatient.setToggleGroup(tg);
         tbCare.setSelected(true);
         // selected / unselected styles (selected shows a highlighted border)
-        String selStyle = "-fx-background-color: linear-gradient(#2b6ff6, #1f66d6); -fx-text-fill: white; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18; -fx-border-color:#1f66d6; -fx-border-width:2; -fx-border-radius:8;";
-        String unselStyle = "-fx-background-color: white; -fx-border-color:#cfe4ff; -fx-text-fill:#2b6ff6; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18;";
+        // selected and unselected styles updated to warm beige/brown palette
+        String selStyle = "-fx-background-color: linear-gradient(#e6ddd6, #d1c6bd); -fx-text-fill: #2c2a29; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18; -fx-border-color:#a8846b; -fx-border-width:2; -fx-border-radius:8;";
+        String unselStyle = "-fx-background-color: white; -fx-border-color:#efe6dd; -fx-text-fill:#6b5146; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18;";
         tbCare.setStyle(selStyle);
         tbPatient.setStyle(unselStyle);
         tbCare.setPrefWidth(150); tbPatient.setPrefWidth(150);
 
         // Create reusable effects for icon tinting
-        javafx.scene.effect.DropShadow hoverShadowCare = new javafx.scene.effect.DropShadow(12, javafx.scene.paint.Color.web("#2b6ff6"));
-        javafx.scene.effect.DropShadow hoverShadowPatient = new javafx.scene.effect.DropShadow(12, javafx.scene.paint.Color.web("#2b6ff6"));
-        javafx.scene.effect.DropShadow selectedShadow = new javafx.scene.effect.DropShadow(18, javafx.scene.paint.Color.web("#1f66d6"));
+        javafx.scene.effect.DropShadow hoverShadowCare = new javafx.scene.effect.DropShadow(18, javafx.scene.paint.Color.web("#a8846b"));
+        javafx.scene.effect.DropShadow hoverShadowPatient = new javafx.scene.effect.DropShadow(18, javafx.scene.paint.Color.web("#a8846b"));
+        javafx.scene.effect.DropShadow selectedShadow = new javafx.scene.effect.DropShadow(22, javafx.scene.paint.Color.web("#8b644a"));
         // stronger blue tint on hover/selected: shift hue toward blue and increase saturation
         javafx.scene.effect.ColorAdjust hoverColorAdjust = new javafx.scene.effect.ColorAdjust();
-        hoverColorAdjust.setHue(0.18);   // small hue shift toward blue
-        hoverColorAdjust.setSaturation(0.45);
+        // subtle warm tint adjustments for a cohesive look with the logo
+        hoverColorAdjust.setHue(-0.08);
+        hoverColorAdjust.setSaturation(0.18);
         hoverColorAdjust.setBrightness(0.02);
         // chain the color adjust under the drop shadow so the icon glows blue
         hoverShadowCare.setInput(hoverColorAdjust);
@@ -204,7 +230,7 @@ public class Main extends Application {
         // Hover behaviour: stronger visual feedback + blue tint glow on the icon
         tbCare.setOnMouseEntered(evt -> {
             if (!tbCare.isSelected()) {
-                tbCare.setStyle(unselStyle + " -fx-effect: dropshadow(gaussian, rgba(47,111,246,0.22), 10, 0.2, 0, 3);");
+                tbCare.setStyle(unselStyle + " -fx-effect: dropshadow(gaussian, rgba(168,132,107,0.30), 16, 0.2, 0, 5);");
                 careIv.setEffect(hoverShadowCare);
             }
         });
@@ -216,7 +242,7 @@ public class Main extends Application {
         });
         tbPatient.setOnMouseEntered(evt -> {
             if (!tbPatient.isSelected()) {
-                tbPatient.setStyle(unselStyle + " -fx-effect: dropshadow(gaussian, rgba(47,111,246,0.22), 10, 0.2, 0, 3);");
+                tbPatient.setStyle(unselStyle + " -fx-effect: dropshadow(gaussian, rgba(168,132,107,0.30), 16, 0.2, 0, 5);");
                 patientIv.setEffect(hoverShadowPatient);
             }
         });
@@ -240,19 +266,19 @@ public class Main extends Application {
         HBox roleBar = new HBox(12, tbCare, tbPatient);
         roleBar.setAlignment(Pos.CENTER);
 
-        // Inputs
-        tfEmail.setPrefWidth(340);
-        pf.setPrefWidth(340);
-        tfEmail.setStyle("-fx-background-radius:6; -fx-border-radius:6; -fx-padding:8; -fx-border-color: #cfe4ff;");
-        pf.setStyle("-fx-background-radius:6; -fx-border-radius:6; -fx-padding:8; -fx-border-color: #cfe4ff;");
+        // Inputs (formPane inner width reduced so it looks balanced)
+        tfEmail.setPrefWidth(320);
+        pf.setPrefWidth(320);
+        tfEmail.setStyle("-fx-background-radius:6; -fx-border-radius:6; -fx-padding:8; -fx-border-color: #efe6dd;");
+        pf.setStyle("-fx-background-radius:6; -fx-border-radius:6; -fx-padding:8; -fx-border-color: #efe6dd;");
 
-        Label emailLabel = new Label("Email"); emailLabel.setStyle("-fx-text-fill:#6b87b7;");
-        Label passLabel = new Label("Password"); passLabel.setStyle("-fx-text-fill:#6b87b7;");
+        Label emailLabel = new Label("Email"); emailLabel.setStyle("-fx-text-fill:#6b5146;");
+        Label passLabel = new Label("Password"); passLabel.setStyle("-fx-text-fill:#6b5146;");
 
         Button loginPrimary = new Button("Login");
-        loginPrimary.setStyle("-fx-background-color: linear-gradient(#2b6ff6, #1f66d6); -fx-text-fill: white; -fx-padding:8 20; -fx-background-radius:8;");
+        loginPrimary.setStyle("-fx-background-color: linear-gradient(#e6ddd6, #d1c6bd); -fx-text-fill: #2c2a29; -fx-padding:8 20; -fx-background-radius:8;");
         Button signupLink = new Button("Signup");
-        signupLink.setStyle("-fx-background-color: transparent; -fx-text-fill:#2b6ff6; -fx-underline:true; -fx-padding:6 10; -fx-font-weight:600;");
+        signupLink.setStyle("-fx-background-color: transparent; -fx-text-fill:#6b5146; -fx-underline:true; -fx-padding:6 10; -fx-font-weight:600;");
 
         // wire our visible primary login button to the same logic as btnLogin
         loginPrimary.setOnAction(btnLogin.getOnAction());
@@ -269,24 +295,36 @@ public class Main extends Application {
         // place original hidden roleChoice in scene graph so logic stays intact
         VBox hidden = new VBox(roleChoice); hidden.setVisible(false); hidden.setManaged(false);
 
-        // Layout assemble: title, subtitle, roleBar, form fields, login button, and status
-        // (logo is now shown on the left side for better balance)
-        card.getChildren().addAll(lblTitle, subtitle, roleBar, emailLabel, tfEmail, passLabel, pf, loginPrimary, footerRow, status, hidden);
+        // assemble formPane (white box)
+        formPane.getChildren().addAll(lblTitle, subtitle, roleBar, emailLabel, tfEmail, passLabel, pf, loginPrimary, footerRow, status, hidden);
 
-        // Layout: put left branding and right card side-by-side centered
-        HBox center = new HBox(28);
-        center.setAlignment(Pos.CENTER);
-        center.getChildren().addAll(leftBox, card);
+        // add left empty area and the white form pane into inner HBox
+        inner.getChildren().addAll(innerLeft, formPane);
 
-        HBox.setHgrow(leftBox, Priority.ALWAYS);
-        leftBox.setPrefWidth(360);
-        card.setPrefWidth(420);
+        // put inner into outerCard
+        outerCard.getChildren().add(inner);
 
-        root.setCenter(center);
+        // Layout: build a base HBox (left spacer + outer card), then layer the logo on top using a StackPane
+        HBox base = new HBox(12);
+        base.setAlignment(Pos.TOP_LEFT);
+        base.getChildren().addAll(leftBox, outerCard);
+
+        // create a StackPane so the logo can be placed above the card (not behind it)
+        StackPane stack = new StackPane();
+        stack.getChildren().addAll(base, sideLogo);
+        // align logo centered vertically on the left side of the layout (not under the card) and nudge horizontally
+        StackPane.setAlignment(sideLogo, Pos.CENTER_LEFT);
+        sideLogo.setTranslateX(40);
+        sideLogo.setTranslateY(0);
+
+        HBox.setHgrow(leftBox, Priority.NEVER);
+        outerCard.setPrefWidth(560);
+
+        root.setCenter(stack);
 
         // bottom small footer
         Label footer = new Label("© MemoraCare");
-        footer.setStyle("-fx-text-fill: #666;");
+        footer.setStyle("-fx-text-fill: #6b5146;");
         BorderPane.setAlignment(footer, Pos.CENTER);
         root.setBottom(footer);
 
@@ -916,7 +954,6 @@ public class Main extends Application {
         g.add(new Label("Email:"),0,1); g.add(tfEmail,1,1);
         g.add(new Label("Password:"),0,2); g.add(pf,1,2);
 
-        // Apply theme styles to the dialog pane and inputs so it matches the login screen
         dlg.getDialogPane().setContent(g);
         dlg.getDialogPane().setStyle("-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding:14;");
         dlg.getDialogPane().setPrefWidth(440);
@@ -924,13 +961,13 @@ public class Main extends Application {
         // color all labels inside the grid to match theme
         for (javafx.scene.Node node : g.getChildren()) {
             if (node instanceof Label) {
-                ((Label) node).setStyle("-fx-text-fill:#6b87b7; -fx-font-weight:600;");
+                ((Label) node).setStyle("-fx-text-fill:#6b5146; -fx-font-weight:600;");
             }
         }
         // style inputs
-        tfName.setStyle("-fx-border-color:#cfe4ff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
-        tfEmail.setStyle("-fx-border-color:#cfe4ff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
-        pf.setStyle("-fx-border-color:#cfe4ff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
+        tfName.setStyle("-fx-border-color:#efe6dd; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
+        tfEmail.setStyle("-fx-border-color:#efe6dd; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
+        pf.setStyle("-fx-border-color:#efe6dd; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
 
         // Add the standard dialog buttons
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -938,8 +975,8 @@ public class Main extends Application {
         // Style the OK / Cancel buttons to match theme
         javafx.scene.control.Button okBtn = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
         javafx.scene.control.Button cancelBtn = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.CANCEL);
-        if (okBtn != null) okBtn.setStyle("-fx-background-color: linear-gradient(#2b6ff6, #1f66d6); -fx-text-fill: white; -fx-background-radius:6; -fx-padding:6 14;");
-        if (cancelBtn != null) cancelBtn.setStyle("-fx-background-color: transparent; -fx-text-fill:#2b6ff6; -fx-padding:6 10; -fx-underline:true;");
+        if (okBtn != null) okBtn.setStyle("-fx-background-color: linear-gradient(#e6ddd6, #d1c6bd); -fx-text-fill: #2c2a29; -fx-background-radius:6; -fx-padding:6 14;");
+        if (cancelBtn != null) cancelBtn.setStyle("-fx-background-color: transparent; -fx-text-fill:#6b5146; -fx-padding:6 10; -fx-underline:true;");
 
         // Keep original OK handling logic exactly as before
         Optional<ButtonType> res = dlg.showAndWait();
@@ -1358,3 +1395,4 @@ public class Main extends Application {
         launch(args);
     }
 }
+
