@@ -6,14 +6,19 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.scene.Node;
 import java.awt.Desktop;
 import java.io.File;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 public class Main extends Application {
@@ -146,7 +151,7 @@ public class Main extends Application {
             tbCare.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
         } catch (Exception ignore) { /* ignore icon load */ }
         try {
-            String patientIconPath = "file:media/patient-logo.png";;
+            String patientIconPath = "file:media/patient-logo.png";
             javafx.scene.image.Image patientImg = new javafx.scene.image.Image(patientIconPath);
             patientIv.setImage(patientImg);
             patientIv.setFitWidth(86);
@@ -716,7 +721,8 @@ public class Main extends Application {
 
         TextField tfName = new TextField(); tfName.setPromptText("Reminder name");
         TextField tfDesc = new TextField(); tfDesc.setPromptText("Description");
-        DatePicker dp = new DatePicker(); dp.setPromptText("Date");
+        DatePicker dp = new DatePicker();
+        dp.setPromptText("Date");
         TextField tfTime = new TextField(); tfTime.setPromptText("HH:mm (optional)");
         Button btnAdd = new Button("Add Reminder");
         Label status = new Label();
@@ -955,218 +961,326 @@ public class Main extends Application {
         }
     }
 
+    // java
     private void showPatientView(Patient patient) {
         BorderPane root = new BorderPane();
-        root.setPadding(new Insets(10));
-        HBox top = new HBox(10);
-        top.setAlignment(Pos.CENTER_LEFT);
-        top.getChildren().addAll(new Label("Patient: " + safeName(patient.getName())));
+        Scene scene = new Scene(root, 900, 600);
+        primaryStage.setScene(scene);
+
+        // Main content: stacked sections
+        VBox centerContent = new VBox(20);
+        centerContent.setPadding(new Insets(20));
+        centerContent.setStyle("-fx-background-color: white;");
+        root.setCenter(centerContent);
+
+        // Header (beige)
+        VBox headerBox = new VBox(5);
+        headerBox.setPadding(new Insets(20));
+        headerBox.setStyle("-fx-background-color: #F5F5DC;");
+        root.setTop(headerBox);
+
+        // Line 1: Welcome + Logout
+        HBox welcomeRow = new HBox(300);
+        Label welcomeLabel = new Label("Hi, " + safeName(patient.getName()));
+        welcomeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        Region hdrSpacer = new Region();
+        HBox.setHgrow(hdrSpacer, Priority.ALWAYS);
         Button btnLogout = new Button("Logout");
         btnLogout.setOnAction(e -> primaryStage.setScene(loginScene));
-        top.getChildren().add(btnLogout);
-        root.setTop(top);
+        welcomeRow.getChildren().addAll(welcomeLabel, hdrSpacer, btnLogout);
+        welcomeRow.setAlignment(Pos.CENTER_LEFT);
 
-        VBox center = new VBox(12); center.setPadding(new Insets(8));
-        Label lblStage = new Label("Stage: " + safeString(patient.getPatientStage()));
-        center.getChildren().add(lblStage);
+        // Line 2: Stage
+        Label stageLabel = new Label("Stage: " + safeString(patient.getPatientStage()));
+        stageLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #555;");
 
-        // --- RELATIVES ROW ---
-        Label relHeader = new Label("Relatives");
-        HBox relRow = new HBox(10);
-        relRow.setPadding(new Insets(6));
-        relRow.setPrefHeight(110);
-        // details pane for selected relative
-        VBox relDetails = new VBox(6);
-        relDetails.setPadding(new Insets(6));
-        relDetails.getChildren().add(new Label("Select a relative to see details"));
+        // Line 3: Search field
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search memories or relatives...");
+        searchField.setStyle("-fx-background-radius: 20; -fx-padding: 10 15; -fx-border-color: #ddd;");
+        searchField.setMaxWidth(400);
 
-        List<Relative> patientRels = patient.getRelatives();
-        for (Relative r : patientRels) {
-            VBox card = new VBox(4);
-            card.setPadding(new Insets(4));
-            card.setStyle("-fx-border-color: #ccc; -fx-border-radius:4; -fx-padding:4;");
+        headerBox.getChildren().addAll(welcomeRow, stageLabel, searchField);
 
-            ImageView iv = new ImageView();
-            iv.setFitWidth(64); iv.setFitHeight(64); iv.setPreserveRatio(true);
-            boolean imageLoaded = false;
+        // --- REMINDERS SECTION ---
+        VBox remindersSection = new VBox(10);
+        Label remTitle = new Label("Upcoming Reminders");
+        remTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        HBox remindersHBox = new HBox(12);
+        remindersHBox.setPadding(new Insets(8));
+        remindersHBox.setAlignment(Pos.CENTER_LEFT);
+
+        ScrollPane remScrollPane = new ScrollPane(remindersHBox);
+        remScrollPane.setFitToHeight(true);
+        remScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        remScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        remScrollPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+
+        // populate reminders (sorted by date/time if available)
+        List<Reminder> remList = patient.getReminders() == null ? Collections.emptyList() : new ArrayList<>(patient.getReminders());
+        // normalize to epoch millis to handle java.util.Date or java.time.LocalDateTime safely
+        remList.sort(Comparator.comparingLong(r -> {
+            if (r == null) return Long.MAX_VALUE;
             try {
-                if (r.getPhotoPath() != null && !r.getPhotoPath().trim().isEmpty()) {
-                    javafx.scene.image.Image img = new javafx.scene.image.Image("file:" + r.getPhotoPath(), 64, 64, true, true);
-                    iv.setImage(img);
-                    imageLoaded = true;
+                // try primary getter
+                Object dateObj = null;
+                try { dateObj = r.getDate(); } catch (Exception ignored) {}
+                if (dateObj instanceof java.util.Date) return ((java.util.Date) dateObj).getTime();
+                if (dateObj instanceof java.time.LocalDateTime) {
+                    return ((java.time.LocalDateTime) dateObj).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
                 }
-            } catch (Exception ignored) { /* ignore image load errors */ }
-            if (!imageLoaded) {
-                // placeholder
-                Label ph = new Label("No photo");
-                ph.setPrefSize(64,64);
-                ph.setStyle("-fx-border-color:#aaa; -fx-alignment:center; -fx-text-alignment:center;");
-                card.getChildren().add(ph);
-            } else {
-                card.getChildren().add(iv);
-            }
-            Label nameLbl = new Label(safeName(r.getName()));
-            card.getChildren().add(nameLbl);
-            card.setOnMouseClicked(ev -> {
-                relDetails.getChildren().clear();
-                Label h = new Label("Relative: " + safeName(r.getName())); h.setStyle("-fx-font-weight:bold;");
-                Label relLabel = new Label("Relationship: " + safeString(r.getRelationship()));
-                Label phone = new Label("Phone: " + safeString(r.getPhoneNumber()));
-                Label gender = new Label("Gender: " + safeString(r.getGender()));
-                Label email = new Label("Email: " + safeString(r.getEmail()));
-                Label addr = new Label("Address: " + safeString(r.getAddress()));
-                Label bday = new Label("Birthday: " + (r.getBirthday()==null?"":r.getBirthday().toString()));
-                relDetails.getChildren().addAll(h, relLabel, phone, gender, email, addr, bday, new Label("Media:"));
-                ListView<String> mlist = new ListView<>();
-                for (Media mm : r.getMediaList()) mlist.getItems().add(mm.getMediaPath() + " (" + mm.getMediaType() + ")");
-                mlist.setPrefHeight(120);
-                // make double-click open the media file with system default
-                mlist.setOnMouseClicked(me -> {
-                    if (me.getClickCount() == 2) {
-                        String sel = mlist.getSelectionModel().getSelectedItem();
-                        if (sel != null) {
-                            // the list item format is "<path> (<type>)" - extract the path portion safely
-                            String path;
-                            int idx = sel.indexOf(" (");
-                            if (idx > 0) path = sel.substring(0, idx); else path = sel;
+                // fallback to an alternative getter if available
+                try {
+                    Object dateObj2 = r.getDate();
+                    if (dateObj2 instanceof java.util.Date) return ((java.util.Date) dateObj2).getTime();
+                    if (dateObj2 instanceof java.time.LocalDateTime) {
+                        return ((java.time.LocalDateTime) dateObj2).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                    }
+                } catch (Exception ignored) {}
+            } catch (Exception ignored) {}
+            return Long.MAX_VALUE;
+        }));
+
+        for (Reminder r : remList) {
+            VBox card = new VBox(6);
+            card.setPadding(new Insets(12));
+            card.setPrefWidth(300);
+            card.setStyle("-fx-background-color: #F5F5DC; -fx-background-radius: 8;");
+            Label name = new Label(r == null ? "Reminder" : safeString(r.getName()));
+            name.setStyle("-fx-font-weight: bold;");
+            Label desc = new Label(r == null ? "" : safeString(r.getDescription()));
+            desc.setWrapText(true);
+            String when = "";
+            try {
+                if (r != null) {
+                    Object d = null;
+                    try { d = r.getDate(); } catch (Exception ignored) {}
+                    if (d == null) try { d = r.getDate(); } catch (Exception ignored) {}
+                    when = d == null ? "" : String.valueOf(d);
+                }
+            } catch (Exception ignored) {}
+            Label whenLbl = new Label(when);
+            whenLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #555;");
+            card.getChildren().addAll(name, desc, whenLbl);
+            remindersHBox.getChildren().add(card);
+        }
+        remindersSection.getChildren().addAll(remTitle, remScrollPane);
+        centerContent.getChildren().add(remindersSection);
+
+        // --- MEMORIES SECTION ---
+        VBox memoriesSection = new VBox(10);
+        Label memTitle = new Label("Your Memories");
+        memTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        HBox memoriesHBox = new HBox(12);
+        memoriesHBox.setPadding(new Insets(8));
+        memoriesHBox.setAlignment(Pos.CENTER_LEFT);
+
+        ScrollPane memScrollPane = new ScrollPane(memoriesHBox);
+        memScrollPane.setFitToHeight(true);
+        memScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        memScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        memScrollPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+
+        List<Memory> memList = patient.getMemories() == null ? Collections.emptyList() : new ArrayList<>(patient.getMemories());
+        for (Memory m : memList) {
+            final Memory mem = m; // final copy for lambda usage
+            VBox card = new VBox(8);
+            card.setPadding(new Insets(12));
+            card.setPrefWidth(300);
+            card.setStyle("-fx-background-color: #F5F5DC; -fx-background-radius: 8;");
+
+            // find thumbnail image among media (best-effort)
+            Node imageRegion;
+            try {
+                String imagePath = null;
+                try {
+                    if (mem != null && mem.getMediaList() != null) {
+                        for (Object mmObj : mem.getMediaList()) {
+                            if (mmObj == null) continue;
                             try {
-                                File f = new File(path);
-                                if (f.exists() && Desktop.isDesktopSupported()) Desktop.getDesktop().open(f);
-                            } catch (Exception ex) { /* ignore */ }
+                                Media mm = (Media) mmObj;
+                                String path = mm.getMediaPath();
+                                String type = null;
+                                try { type = mm.getMediaType(); } catch (Exception ignored) {}
+                                if (path != null) {
+                                    String pLower = path.toLowerCase();
+                                    if ((type != null && type.toLowerCase().contains("image")) ||
+                                            pLower.endsWith(".png") || pLower.endsWith(".jpg") || pLower.endsWith(".jpeg") ||
+                                            pLower.endsWith(".gif") || pLower.endsWith(".bmp")) {
+                                        imagePath = path;
+                                        break;
+                                    }
+                                }
+                            } catch (ClassCastException ignored) {
+                                // ignore non-Media objects
+                            }
                         }
                     }
-                });
-                relDetails.getChildren().add(mlist);
-            });
-            relRow.getChildren().add(card);
-        }
+                } catch (Exception ignored) {}
 
-        HBox relBox = new HBox(12, relRow, relDetails);
-        relBox.setAlignment(Pos.TOP_LEFT);
-
-        // --- MEMORIES ROW ---
-        Label memHeader = new Label("Memories");
-        HBox memRow = new HBox(10);
-        memRow.setPadding(new Insets(6));
-        memRow.setPrefHeight(110);
-        VBox memDetails = new VBox(6);
-        memDetails.setPadding(new Insets(6));
-        memDetails.getChildren().add(new Label("Select a memory to see details"));
-
-        List<Memory> patientMems = patient.getMemories();
-        for (Memory m : patientMems) {
-            VBox card = new VBox(4); card.setPadding(new Insets(4));
-            card.setStyle("-fx-border-color: #ccc; -fx-border-radius:4; -fx-padding:4;");
-
-            // show thumbnails for all media attached to the memory (images as thumbnails, others as small labeled placeholders)
-            HBox thumbs = new HBox(6);
-            thumbs.setPadding(new Insets(2));
-            for (Media mm : m.getMediaList()) {
-                if (mm == null) continue;
-                String path = mm.getMediaPath();
-                String type = mm.getMediaType();
-                if (type != null && type.equalsIgnoreCase("image") && path != null && !path.trim().isEmpty()) {
-                    try {
-                        javafx.scene.image.Image img = new javafx.scene.image.Image("file:" + path, 64, 64, true, true);
-                        ImageView thumb = new ImageView(img);
-                        thumb.setFitWidth(64); thumb.setFitHeight(64); thumb.setPreserveRatio(true);
-                        // open on click
-                        thumb.setOnMouseClicked(ev -> {
-                            try { File f = new File(path); if (f.exists() && Desktop.isDesktopSupported()) Desktop.getDesktop().open(f); } catch (Exception ex) { /* ignore */ }
-                        });
-                        thumbs.getChildren().add(thumb);
-                    } catch (Exception ignored) {
-                        Label ph = new Label("img err"); ph.setPrefSize(64,64); ph.setStyle("-fx-border-color:#aaa; -fx-alignment:center;");
-                        thumbs.getChildren().add(ph);
-                    }
+                if (imagePath != null && new File(imagePath).exists()) {
+                    Image img = new Image(new File(imagePath).toURI().toString(), 280, 160, true, true);
+                    ImageView iv = new ImageView(img);
+                    iv.setPreserveRatio(true);
+                    iv.setSmooth(true);
+                    imageRegion = iv;
                 } else {
-                    // non-image media - show small clickable label with type
-                    Label ph = new Label((type==null?"file":type));
-                    ph.setPrefSize(64,64);
-                    ph.setStyle("-fx-border-color:#aaa; -fx-alignment:center; -fx-text-alignment:center;");
-                    String pth = path;
-                    ph.setOnMouseClicked(ev -> {
-                        try { if (pth != null) { File f = new File(pth); if (f.exists() && Desktop.isDesktopSupported()) Desktop.getDesktop().open(f); } } catch (Exception ex) { /* ignore */ }
-                    });
-                    thumbs.getChildren().add(ph);
+                    StackPane placeholder = new StackPane();
+                    placeholder.setPrefSize(280, 160);
+                    placeholder.setStyle("-fx-background-color: #EFEAD8; -fx-background-radius:6;");
+                    Label pLbl = new Label("No Image");
+                    pLbl.setStyle("-fx-text-fill:#777;");
+                    placeholder.getChildren().add(pLbl);
+                    imageRegion = placeholder;
                 }
-            }
-            if (thumbs.getChildren().isEmpty()) {
-                Label ph = new Label("No media"); ph.setPrefSize(64,64); ph.setStyle("-fx-border-color:#aaa; -fx-alignment:center; -fx-text-alignment:center;");
-                card.getChildren().add(ph);
-            } else {
-                card.getChildren().add(thumbs);
+            } catch (Exception ex) {
+                StackPane placeholder = new StackPane();
+                placeholder.setPrefSize(280, 160);
+                placeholder.setStyle("-fx-background-color: #EFEAD8;");
+                placeholder.getChildren().add(new Label("No Image"));
+                imageRegion = placeholder;
             }
 
-            Label title = new Label(safeString(m.getName()));
-            Label when = new Label(m.getDate()==null?"":m.getDate().toString());
-            card.getChildren().addAll(title, when);
-            card.setOnMouseClicked(ev -> {
-                memDetails.getChildren().clear();
-                Label h = new Label("Memory: " + safeString(m.getName())); h.setStyle("-fx-font-weight:bold;");
-                Label desc = new Label("Description: " + safeString(m.getDescription()));
-                Label date = new Label("Date: " + (m.getDate()==null?"":m.getDate().toString()));
-                memDetails.getChildren().addAll(h, desc, date, new Label("Relatives:"));
-                ListView<String> rlist = new ListView<>();
-                for (Relative rr : m.getRelatives()) rlist.getItems().add(rr.getName() + " (" + rr.getRelationship() + ")");
-                rlist.setPrefHeight(80);
-                memDetails.getChildren().add(rlist);
-                memDetails.getChildren().add(new Label("Media:"));
-                ListView<String> mlist = new ListView<>();
-                for (Media mm : m.getMediaList()) mlist.getItems().add(mm.getMediaPath() + " (" + mm.getMediaType() + ")");
-                mlist.setPrefHeight(100);
-                mlist.setOnMouseClicked(me -> {
-                    if (me.getClickCount() == 2) {
-                        String sel = mlist.getSelectionModel().getSelectedItem();
-                        if (sel != null) {
-                            // the list item format is "<path> (<type>)" - extract the path portion safely
-                            String path;
-                            int idx = sel.indexOf(" (");
-                            if (idx > 0) path = sel.substring(0, idx); else path = sel;
-                            try { File f = new File(path); if (f.exists() && Desktop.isDesktopSupported()) Desktop.getDesktop().open(f); } catch (Exception ex) { /* ignore */ }
-                        }
+            Label name = new Label(mem == null ? "Memory" : safeString(mem.getName()));
+            name.setStyle("-fx-font-weight: bold;");
+            Label desc = new Label(mem == null ? "" : safeString(mem.getDescription()));
+            desc.setWrapText(true);
+
+            card.getChildren().addAll(imageRegion, name, desc);
+
+            // click to open details dialog with media list and Open buttons
+            card.setOnMouseClicked(evt -> {
+                showMemoryDetailsDialog(mem);
+            });
+
+            memoriesHBox.getChildren().add(card);
+        }
+        memoriesSection.getChildren().addAll(memTitle, memScrollPane);
+        centerContent.getChildren().add(memoriesSection);
+
+        // --- RELATIVES SECTION ---
+        VBox relativesSection = new VBox(10);
+        Label relTitle = new Label("Closest Relatives");
+        relTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        HBox relativesHBox = new HBox(16);
+        relativesHBox.setPadding(new Insets(8));
+        relativesHBox.setAlignment(Pos.CENTER_LEFT);
+
+        ScrollPane relScrollPane = new ScrollPane(relativesHBox);
+        relScrollPane.setFitToHeight(true);
+        relScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        relScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        relScrollPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+
+        List<Relative> relList = patient.getRelatives() == null ? Collections.emptyList() : new ArrayList<>(patient.getRelatives());
+        for (Relative r : relList) {
+            final Relative rel = r; // final copy for lambda usage
+             VBox card = new VBox(6);
+             card.setPadding(new Insets(10));
+             card.setPrefWidth(160);
+             card.setAlignment(Pos.TOP_CENTER);
+             card.setStyle("-fx-background-color: #F5F5DC; -fx-background-radius: 8;");
+ 
+             ImageView iv = new ImageView();
+             try {
+                String p = null;
+                try { p = rel.getPhotoPath(); } catch (Exception ignored) {}
+                if (p != null && new File(p).exists()) {
+                    Image img = new Image(new File(p).toURI().toString(), 80, 80, true, true);
+                    iv.setImage(img);
+                }
+             } catch (Exception ignore) {}
+             iv.setFitWidth(80);
+             iv.setFitHeight(80);
+             Circle clip = new Circle(40, 40, 40);
+             iv.setClip(clip);
+ 
+             Label name = new Label(rel == null ? "Relative" : safeString(rel.getName()));
+             name.setStyle("-fx-font-weight: bold;");
+             Label relation = new Label(rel == null ? "" : safeString(rel.getRelationship()));
+             relation.setStyle("-fx-font-size: 12px; -fx-text-fill: #555;");
+ 
+             card.getChildren().addAll(iv, name, relation);
+ 
+             // show full contact info popup
+             card.setOnMouseClicked(evt -> {
+                 showRelativeDetailsDialog(rel);
+             });
+ 
+             relativesHBox.getChildren().add(card);
+         }
+        relativesSection.getChildren().addAll(relTitle, relScrollPane);
+        centerContent.getChildren().add(relativesSection);
+
+        primaryStage.setTitle("Patient Dashboard - " + safeName(patient.getName()));
+        // ensure size applies
+        primaryStage.setWidth(scene.getWidth());
+        primaryStage.setHeight(scene.getHeight());
+    }
+
+    // Show a memory details dialog including list of attached media and ability to open files
+    private void showMemoryDetailsDialog(Memory mem) {
+        if (mem == null) return;
+        Stage dlg = new Stage();
+        dlg.initOwner(primaryStage);
+        dlg.initModality(Modality.APPLICATION_MODAL);
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(12));
+        Label title = new Label(safeString(mem.getName()));
+        title.setStyle("-fx-font-size:16px; -fx-font-weight:bold;");
+        Label desc = new Label(safeString(mem.getDescription()));
+        desc.setWrapText(true);
+        content.getChildren().addAll(title, desc);
+
+        List<Media> mediaList = Collections.emptyList();
+        try { mediaList = mem.getMediaList() == null ? Collections.emptyList() : mem.getMediaList(); } catch (Exception ignored) {}
+        for (Media mm : mediaList) {
+            if (mm == null) continue;
+            HBox row = new HBox(8);
+            row.setAlignment(Pos.CENTER_LEFT);
+            String path = null;
+            try { path = mm.getMediaPath(); } catch (Exception ignored) {}
+            Label fileLabel = new Label(path == null ? "(unknown)" : new File(path).getName());
+            Button openBtn = new Button("Open");
+            String finalPath = path;
+            openBtn.setOnAction(ae -> {
+                try {
+                    if (finalPath != null && new File(finalPath).exists() && Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(new File(finalPath));
                     }
-                });
-                memDetails.getChildren().add(mlist);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             });
-            memRow.getChildren().add(card);
+            row.getChildren().addAll(fileLabel, openBtn);
+            content.getChildren().add(row);
         }
-        HBox memBox = new HBox(12, memRow, memDetails);
 
-        // --- REMINDERS ROW ---
-        Label remHeader = new Label("Reminders");
-        HBox remRow = new HBox(10);
-        remRow.setPadding(new Insets(6));
-        remRow.setPrefHeight(110);
-        VBox remDetails = new VBox(6);
-        remDetails.setPadding(new Insets(6));
-        remDetails.getChildren().add(new Label("Select a reminder to see details"));
+        ScrollPane sp = new ScrollPane(content);
+        sp.setFitToWidth(true);
+        Scene s = new Scene(sp, 560, 420);
+        dlg.setScene(s);
+        dlg.showAndWait();
+    }
 
-        List<Reminder> patientRems = patient.getReminders();
-        for (Reminder r : patientRems) {
-            VBox card = new VBox(4); card.setPadding(new Insets(4)); card.setStyle("-fx-border-color: #ccc; -fx-border-radius:4; -fx-padding:4;");
-            Label title = new Label(safeString(r.getName()));
-            String whenS = ""; try { if (r.getDate() != null) whenS = r.getDate().toString(); } catch (Exception ignored) {}
-            final String whenSLocal = whenS;
-            Label when = new Label(whenSLocal);
-            card.getChildren().addAll(title, when);
-            card.setOnMouseClicked(ev -> {
-                remDetails.getChildren().clear();
-                Label h = new Label("Reminder: " + safeString(r.getName())); h.setStyle("-fx-font-weight:bold;");
-                Label desc = new Label("Description: " + safeString(r.getDescription()));
-                Label date = new Label("When: " + whenSLocal);
-                Label done = new Label("Done: " + String.valueOf(r.getDone()));
-                remDetails.getChildren().addAll(h, desc, date, done);
-            });
-            remRow.getChildren().add(card);
-        }
-        HBox remBox = new HBox(12, remRow, remDetails);
-
-        center.getChildren().addAll(relHeader, relBox, memHeader, memBox, remHeader, remBox);
-        root.setCenter(center);
-
-        Scene s = new Scene(root);
-        primaryStage.setScene(s);
+    // Show a relative details dialog with contact info
+    private void showRelativeDetailsDialog(Relative rel) {
+        if (rel == null) return;
+        Stage dlg = new Stage();
+        dlg.initOwner(primaryStage);
+        dlg.initModality(Modality.APPLICATION_MODAL);
+        VBox content = new VBox(8);
+        content.setPadding(new Insets(12));
+        Label name = new Label(safeString(rel.getName()));
+        name.setStyle("-fx-font-size:14px; -fx-font-weight:bold;");
+        Label phone = new Label("Phone: " + safeString(rel.getPhoneNumber()));
+        Label email = new Label("Email: " + safeString(rel.getEmail()));
+        Label address = new Label("Address: " + safeString(rel.getAddress()));
+        Label bday = new Label("Birthday: " + (rel.getBirthday() == null ? "" : String.valueOf(rel.getBirthday())));
+        content.getChildren().addAll(name, phone, email, address, bday);
+        Scene s = new Scene(content, 360, 220);
+        dlg.setScene(s);
+        dlg.showAndWait();
     }
 
     private User findUserByCredentials(String email, String password) {
