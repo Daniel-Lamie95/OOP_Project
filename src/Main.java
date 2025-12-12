@@ -105,7 +105,7 @@ public class Main extends Application {
         ImageView sideLogo = new ImageView();
         // Load the provided logo into the left branding panel and make it larger for balance
         try {
-            String logoPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/WhatsApp Image 2025-12-08 at 02.09.15_16f50d91.jpg";
+            String logoPath = "file:media/logo.jpg";
             javafx.scene.image.Image img = new javafx.scene.image.Image(logoPath);
             sideLogo.setImage(img);
             // make the polaroid a bit larger per request (centered and slightly bigger)
@@ -160,7 +160,7 @@ public class Main extends Application {
         ImageView patientIv = new ImageView();
         // Load role icons and put them above the button text (TOP)
         try {
-            String careIconPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/7051035.png";
+            String careIconPath = "file:media/caregiver-icon.png";
             javafx.scene.image.Image careImg = new javafx.scene.image.Image(careIconPath);
             careIv.setImage(careImg);
             careIv.setFitWidth(86);
@@ -170,7 +170,7 @@ public class Main extends Application {
             tbCare.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
         } catch (Exception ignore) { /* ignore icon load */ }
         try {
-            String patientIconPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/tax-inspector.png";
+            String patientIconPath = "file:media/patient-logo.png";;
             javafx.scene.image.Image patientImg = new javafx.scene.image.Image(patientIconPath);
             patientIv.setImage(patientImg);
             patientIv.setFitWidth(86);
