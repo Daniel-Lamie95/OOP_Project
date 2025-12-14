@@ -1,57 +1,61 @@
+<#
+run-javafx.ps1
+Usage:
+  .\run-javafx.ps1               # uses javac/java from PATH
+  .\run-javafx.ps1 "C:\Program Files\Java\jdk-17.0.8\bin"   # provide JDK bin folder if javac not in PATH
+
+What it does:
+ - Resolves the local JavaFX SDK in ./javafx-sdk-20.0.2/javafx-sdk-20.0.2/lib
+ - Compiles all .java files in src/ to out/ using javac
+ - Runs the Main class with the javafx modules on the module-path
+#>
 param(
-    [string]$JavafxLib = $env:JAVAFX_LIB,
-    [string]$MainClass = 'Main'
+    [string]$jdkBin
 )
 
-# Validate provided JavaFX lib path (should be the SDK 'lib' folder)
-if (-not $JavafxLib -or -not (Test-Path $JavafxLib -PathType Container)) {
-    Write-Error "JavaFX lib path not found. Set the JAVAFX_LIB environment variable to the SDK's 'lib' folder or pass -JavafxLib 'C:\path\to\javafx-sdk-XX\lib'"
-    exit 1
+function Resolve-JavaCmds {
+    param([string]$jdkBinParam)
+    if ($jdkBinParam -and (Test-Path $jdkBinParam)) {
+        $javac = Join-Path $jdkBinParam 'javac.exe'
+        $java = Join-Path $jdkBinParam 'java.exe'
+        if (Test-Path $javac -and Test-Path $java) { return @{javac=$javac; java=$java} }
+    }
+    $javacCmd = Get-Command javac -ErrorAction SilentlyContinue
+    $javaCmd = Get-Command java -ErrorAction SilentlyContinue
+    if ($javacCmd -and $javaCmd) { return @{javac=$javacCmd.Path; java=$javaCmd.Path} }
+    return $null
 }
 
-Write-Host "Using JavaFX lib: $JavafxLib"
-
-# Collect java sources
-$srcFiles = Get-ChildItem -Path .\src -Recurse -Filter *.java -File | ForEach-Object { $_.FullName }
-if (-not $srcFiles -or $srcFiles.Count -eq 0) {
-    Write-Error "No Java source files found under .\src"
+$jdk = Resolve-JavaCmds -jdkBinParam $jdkBin
+if (-not $jdk) {
+    Write-Host "ERROR: javac/java not found. Install JDK 17+ or provide path to JDK bin as parameter." -ForegroundColor Red
+    Write-Host "Example: .\\run-javafx.ps1 'C:\\Program Files\\Java\\jdk-17.0.8\\bin'"
     exit 1
 }
-
-# Ensure javac/java are available
-if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {
-    Write-Error "javac not found in PATH. Ensure a JDK is installed and 'javac' is available on PATH."
+$mpPath = Resolve-Path '.\javafx-sdk-20.0.2\javafx-sdk-20.0.2\lib' -ErrorAction SilentlyContinue
+if (-not $mpPath) {
+    Write-Host "ERROR: JavaFX SDK not found at .\javafx-sdk-20.0.2\javafx-sdk-20.0.2\lib" -ForegroundColor Red
+    Write-Host "Make sure the javafx-sdk folder from the repo is present.";
     exit 1
 }
-if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
-    Write-Error "java not found in PATH. Ensure a JDK is installed and 'java' is available on PATH."
-    exit 1
-}
+$mp = $mpPath.Path
+Write-Host "Using javac: $($jdk.javac)" -ForegroundColor Green
+Write-Host "Using java:  $($jdk.java)" -ForegroundColor Green
+Write-Host "JavaFX lib:  $mp" -ForegroundColor Green
 
-# Prepare output dir
-if (Test-Path .\out) { Remove-Item -Recurse -Force .\out }
-New-Item -ItemType Directory -Path .\out | Out-Null
+# create out dir
+if (-not (Test-Path .\out)) { New-Item -ItemType Directory -Path .\out | Out-Null }
 
-# Build javac argument array (PowerShell will handle quoting for paths with spaces)
-$moduleArgs = @('--module-path', $JavafxLib, '--add-modules', 'javafx.controls,javafx.fxml', '-d', (Resolve-Path .\out).Path)
-$javacArgs = $moduleArgs + $srcFiles
-
-Write-Host "Compiling with javac..."
-Write-Host "javac $($javacArgs -join ' ')"
-
-# Invoke javac
-& javac @javacArgs
+# compile
+& "$($jdk.javac)" --module-path "$mp" --add-modules javafx.controls,javafx.fxml -d out src\*.java
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Compilation failed (javac exit code $LASTEXITCODE). Ensure JDK is installed and JAVAFX_LIB points to the JavaFX SDK lib folder."
+    Write-Host "Compilation failed." -ForegroundColor Red
     exit $LASTEXITCODE
 }
+Write-Host "Compilation succeeded." -ForegroundColor Green
 
-# Run the app
-$javaArgs = @('--module-path', $JavafxLib, '--add-modules', 'javafx.controls,javafx.fxml', '-cp', (Resolve-Path .\out).Path, $MainClass)
-Write-Host "Running: java $($javaArgs -join ' ')"
-& java @javaArgs
-$rc = $LASTEXITCODE
-if ($rc -ne 0) {
-    Write-Error "Application exited with code $rc"
-}
-exit $rc
+# run
+& "$($jdk.java)" --module-path "$mp" --add-modules javafx.controls,javafx.fxml -cp out Main
+
+if ($LASTEXITCODE -ne 0) { Write-Host "Application exited with code $LASTEXITCODE" -ForegroundColor Yellow }
+

@@ -100,7 +100,7 @@ public class Main extends Application {
             status.setText("Accounts reloaded (on next action).");
         });
 
-        btnSignUpCaregiver.setOnAction(e -> showCaregiverDashboard());
+        btnSignUpCaregiver.setOnAction(e -> showSignUpCaregiverDialog());
 
         // Build a polished UI: left image/branding and right card form
         BorderPane root = new BorderPane();
@@ -341,51 +341,107 @@ public class Main extends Application {
     }
 
     private void showCaregiverDashboard(Caregiver caregiver) {
-        // layout
+
+        // ROOT + SCROLL
         BorderPane root = new BorderPane();
-        root.setPadding(new Insets(10));
 
-        // Top: header + logout
-        HBox top = new HBox(10);
-        top.setAlignment(Pos.CENTER_LEFT);
-        Label lbl = new Label("Caregiver: " + safeName(caregiver.getName()));
-        Button btnLogout = new Button("Logout");
-        btnLogout.setOnAction(e -> primaryStage.setScene(loginScene));
-        top.getChildren().addAll(lbl, btnLogout);
-        root.setTop(top);
+        ScrollPane mainScroll = new ScrollPane();
+        mainScroll.setFitToWidth(true);
+        mainScroll.setStyle("-fx-background:#E2DCC2; -fx-border-color:transparent;");
+        root.setCenter(mainScroll);
 
-        // Center: patient area (either assigned patient or create one)
-        VBox center = new VBox(8);
-        center.setPadding(new Insets(8));
+        VBox page = new VBox(35);
+        page.setPadding(new Insets(30));
+        page.setStyle("-fx-background-color:#E2DCC2;");
+        mainScroll.setContent(page);
 
-        Label patientHeader = new Label("Assigned patient");
-        patientHeader.setStyle("-fx-font-weight:bold;");
-        center.getChildren().add(patientHeader);
+        Scene scene = new Scene(root, 1100, 720);
+        primaryStage.setScene(scene);
 
-        VBox patientBox = new VBox(6);
+        // ---------------- HEADER ----------------
+        VBox header = new VBox(15);
+        header.setPadding(new Insets(22));
+        header.setStyle(
+                "-fx-background-color:#D8CBAE;" +
+                        "-fx-background-radius:18;" +
+                        "-fx-effect:dropshadow(gaussian, rgba(0,0,0,0.12),10,0,0,3);"
+        );
+
+        HBox topRow = new HBox();
+        topRow.setAlignment(Pos.CENTER_LEFT);
+
+        Label title = new Label("Caregiver Dashboard");
+        title.setStyle("-fx-font-size:26px;-fx-font-weight:bold;-fx-text-fill:#3B3B3B;");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.setStyle(
+                "-fx-background-color:white;" +
+                        "-fx-background-radius:16;" +
+                        "-fx-border-color:#CFC1A3;" +
+                        "-fx-border-radius:16;" +
+                        "-fx-font-weight:bold;"
+        );
+        logoutBtn.setOnAction(e -> primaryStage.setScene(loginScene));
+
+        topRow.getChildren().addAll(title, spacer, logoutBtn);
+
+        Label nameLbl = new Label("Welcome, " + safeName(caregiver.getName()));
+        nameLbl.setStyle("-fx-font-size:14px;-fx-text-fill:#4A4A4A;");
+
+        header.getChildren().addAll(topRow, nameLbl);
+        page.getChildren().add(header);
+
+        // ---------------- PATIENT CARD ----------------
+        VBox patientCard = new VBox(12);
+        patientCard.setPadding(new Insets(18));
+        patientCard.setStyle(
+                "-fx-background-color:#F0E1B8;" +
+                        "-fx-background-radius:18;" +
+                        "-fx-effect:dropshadow(gaussian, rgba(0,0,0,0.1),6,0,0,2);"
+        );
+
+        Label patientTitle = new Label("Assigned Patient");
+        patientTitle.setStyle("-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:#3B3B3B;");
+
+        VBox patientBox = new VBox(8);
         updatePatientBox(patientBox, caregiver);
-        center.getChildren().add(patientBox);
 
-        root.setCenter(center);
+        patientCard.getChildren().addAll(patientTitle, patientBox);
+        page.getChildren().add(patientCard);
 
-        // Right: tabs for relatives, memories, reminders
+        // ---------------- TABS SECTION ----------------
         TabPane tabs = new TabPane();
+        tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tabs.setStyle("-fx-background-color:transparent;");
+
         Tab tabRel = new Tab("Relatives");
         Tab tabMem = new Tab("Memories");
         Tab tabRem = new Tab("Reminders");
 
-        tabRel.setContent(createRelativesPane(caregiver, patientBox));
-        tabMem.setContent(createMemoriesPane(caregiver, patientBox));
-        tabRem.setContent(createRemindersPane(caregiver, patientBox));
+        tabRel.setContent(wrapCaregiverCard(createRelativesPane(caregiver, patientBox)));
+        tabMem.setContent(wrapCaregiverCard(createMemoriesPane(caregiver, patientBox)));
+        tabRem.setContent(wrapCaregiverCard(createRemindersPane(caregiver, patientBox)));
 
         tabs.getTabs().addAll(tabRel, tabMem, tabRem);
-        tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        page.getChildren().add(tabs);
 
-        root.setRight(tabs);
-
-        Scene s = new Scene(root);
-        primaryStage.setScene(s);
+        primaryStage.setTitle("Caregiver Dashboard - " + safeName(caregiver.getName()));
     }
+    private VBox wrapCaregiverCard(Node content) {
+        VBox card = new VBox(15);
+        card.setPadding(new Insets(20));
+        card.setStyle(
+                "-fx-background-color:#D8CBAE;" +
+                        "-fx-background-radius:18;" +
+                        "-fx-effect:dropshadow(gaussian, rgba(0,0,0,0.12),8,0,0,3);"
+        );
+        card.getChildren().add(content);
+        return card;
+    }
+
 
     private void updatePatientBox(VBox patientBox, Caregiver caregiver) {
         patientBox.getChildren().clear();

@@ -1,8 +1,8 @@
 import java.io.Serializable;
 import java.util.*;
 import java.util.UUID;
-import java.io.Serializable;
-public class Patient extends User implements Searchable, Serializable{
+
+public class Patient extends User implements Searchable, Serializable {
     private static final long serialVersionUID = 1L;
     private String patientStage;
     private ArrayList<Relative> relatives;
@@ -53,33 +53,33 @@ public class Patient extends User implements Searchable, Serializable{
         return reminders;
     }
 
-    public void addMemories(Memory m){
+    public void addMemories(Memory m) {
         memories.add(m);
     }
 
-    public void addRelatives(Relative re){
+    public void addRelatives(Relative re) {
         relatives.add(re);
     }
 
-    public void addReminder(Reminder r){
+    public void addReminder(Reminder r) {
         reminders.add(r);
     }
 
-    public void deleteReminder(String name){
+    public void deleteReminder(String name) {
         reminders.removeIf(r -> r.getName().equals(name));
     }
 
-    public void deleteMemory(String name){
+    public void deleteMemory(String name) {
         memories.removeIf(m -> m.getName().equals(name));
     }
 
-    public void deleteRelative(String name){
+    public void deleteRelative(String name) {
         relatives.removeIf(re -> re.getName().equals(name));
     }
 
     @Override
     public Memory findMemory(String memoryName) {
-        for (Memory m :  getMemories())
+        for (Memory m : getMemories())
             if (m.getName().equals(memoryName))
                 return m;
         return null;
