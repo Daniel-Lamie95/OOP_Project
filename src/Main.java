@@ -624,6 +624,7 @@ public class Main extends Application {
         dp.setPromptText("Date");
         ListView<Relative> relSelect = new ListView<>();
         relSelect.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        relSelect.setPrefHeight(100);
         Label status = new Label();
         Runnable refreshRelSelect = () -> {
             relSelect.getItems().clear();
@@ -828,7 +829,9 @@ public class Main extends Application {
         formGrid.add(new Label("Name:"), 0, 0); formGrid.add(tfName, 1, 0);
         formGrid.add(new Label("Description:"), 2, 0); formGrid.add(tfDesc, 3, 0);
         formGrid.add(new Label("Date:"), 0, 1); formGrid.add(dp, 1, 1);
-        formGrid.add(new Label("Media path:"), 2, 1); formGrid.add(tfMediaPath, 3, 1); formGrid.add(btnMemPick, 0, 2);
+        // Add associate relatives selector to the creation form (label text starts with 'Associate relatives' to match refresh helper)
+        formGrid.add(new Label("Associate relatives:"), 2, 1); formGrid.add(relSelect, 3, 1);
+        formGrid.add(new Label("Media path:"), 2, 2); formGrid.add(tfMediaPath, 3, 2); formGrid.add(btnMemPick, 0, 2);
         formGrid.add(new Label("Type:"), 0, 2); formGrid.add(cbMediaType, 1, 2);
         formGrid.add(new Label("Media desc:"), 2, 2); formGrid.add(tfMediaDesc, 3, 2);
         formGrid.add(new Label("Media list:"), 0, 3);
@@ -1559,10 +1562,11 @@ public class Main extends Application {
                 javafx.scene.Node n = dq.removeFirst();
                 if (n instanceof Label) {
                     String txt = ((Label) n).getText();
-                    if (txt != null && txt.startsWith("Associate relatives")) {
+                    if (txt != null && (txt.startsWith("Associate relatives") || txt.startsWith("Associated relatives"))) {
                         javafx.scene.Parent parent = n.getParent();
-                        if (parent instanceof javafx.scene.layout.VBox) {
-                            for (javafx.scene.Node child : ((javafx.scene.layout.VBox) parent).getChildren()) {
+                        if (parent != null) {
+                            // update any ListView children in the same parent, regardless of parent type
+                            for (javafx.scene.Node child : parent.getChildrenUnmodifiable()) {
                                 if (child instanceof ListView) {
                                     @SuppressWarnings("rawtypes")
                                     ListView list = (ListView) child;
