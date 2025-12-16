@@ -94,8 +94,8 @@ public class Memory extends PatientInfo implements Serializable{
 
         if (media == null) return;
         String path = media.getMediaPath();
-        if (path == null || path.isBlank()) return; // skip invalid media
-        if (mediaExists(path)) return; // already added
+        if (path == null || path.isBlank()) return;
+        if (mediaExists(path)) return;
         String type = media.getMediaType() == null ? "file" : media.getMediaType();
 
         this.mediaList.add(new Media(path, type, media.getDescription()));

@@ -958,7 +958,7 @@ public class Main extends Application {
             ArrayList<User> accounts = fh.loadAccounts();
             for (User u : accounts) if (u.getEmail() != null && u.getEmail().equals(email)) {
                 Alert a = new Alert(Alert.AlertType.ERROR, "Email already in use.", ButtonType.OK); a.showAndWait(); return; }
-            Caregiver c = new Caregiver(name, email, pass);
+            Caregiver c = new Caregiver(name,java.util.UUID.randomUUID(), email, pass);
             fh.addAccount(c);
             Alert a = new Alert(Alert.AlertType.INFORMATION, "Caregiver account created. You can now log in.", ButtonType.OK); a.showAndWait();
         }

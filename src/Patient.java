@@ -17,14 +17,6 @@ public class Patient extends User implements Searchable, Serializable {
         this.reminders = new ArrayList<>();
     }
 
-    public Patient(String name, String email, String password, String patientStage) {
-        super(name, email, password);
-        this.patientStage = patientStage;
-        this.relatives = new ArrayList<>();
-        this.memories = new ArrayList<>();
-        this.reminders = new ArrayList<>();
-    }
-
     public Patient(String name, UUID id, String email, String password, String patientStage) {
         super(name, id, email, password);
         this.patientStage = patientStage;

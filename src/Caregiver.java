@@ -8,11 +8,6 @@ public class Caregiver extends User implements Searchable, Serializable{
         super();
     }
 
-    public Caregiver(String name, String email, String password) {
-        super(name, email, password);
-        this.patient = null;
-    }
-
     public Caregiver(String name,UUID id, String email, String password) {
         super(name, id, email, password);
         this.patient = null;
