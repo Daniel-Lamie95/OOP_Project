@@ -28,7 +28,7 @@ public class FileHandler {
         }
     }
 
-    // Add one user (loads current list, appends, then saves)
+
     public void addAccount(User user) {
         ArrayList<User> users = loadAccounts();
         users.add(user);

@@ -1,4 +1,3 @@
-// JavaFX GUI to test FileHandler (uses email-based update/delete)
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -49,7 +48,7 @@ public class Main extends Application {
     }
 
     private Scene createLoginScene() {
-        // Form controls and existing logic kept exactly the same
+
         Label lblTitle = new Label("Welcome to MemoraCare");
         lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#6b5146;");
 
@@ -60,7 +59,7 @@ public class Main extends Application {
         PasswordField pf = new PasswordField();
         pf.setPromptText("Enter password");
 
-        // Keep the logical roleChoice but we'll present ToggleButtons that sync to it
+
         ChoiceBox<String> roleChoice = new ChoiceBox<>(FXCollections.observableArrayList("Caregiver", "Patient"));
         roleChoice.setValue("Caregiver");
         roleChoice.setVisible(false); roleChoice.setManaged(false);
@@ -70,7 +69,7 @@ public class Main extends Application {
         Button btnSignUpCaregiver = new Button("Sign up (Caregiver)");
         Label status = new Label();
 
-        // keep original button logic exactly
+
         btnLogin.setOnAction(e -> {
             String email = tfEmail.getText().trim();
             String pass = pf.getText();
@@ -96,82 +95,62 @@ public class Main extends Application {
         });
 
         btnRefresh.setOnAction(e -> {
-            // simple feedback; FileHandler loads on demand
             status.setText("Accounts reloaded (on next action).");
         });
 
         btnSignUpCaregiver.setOnAction(e -> showSignUpCaregiverDialog());
 
-        // Build a polished UI: left image/branding and right card form
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(20));
-        // use a warm, neutral background to match the logo's palette
         root.setStyle("-fx-background-color: linear-gradient(#fbf8f6, #f2ebe6);");
 
-        // Left branding area: top-aligned so the logo lines up with the top of the login card
         VBox leftBox = new VBox(12);
         leftBox.setAlignment(Pos.TOP_LEFT);
-        // reduce left box width a bit and remove bottom padding; we'll nudge the logo into the card area
         leftBox.setPadding(new Insets(10, 0, 0, 0));
         leftBox.setStyle("-fx-background-color: transparent;");
 
         ImageView sideLogo = new ImageView();
-        // Load the provided logo into the left branding panel and make it larger for balance
         try {
             String logoPath = "file:media/logo.jpg";
             javafx.scene.image.Image img = new javafx.scene.image.Image(logoPath);
             sideLogo.setImage(img);
-            // make the polaroid a bit larger per request (centered and slightly bigger)
             sideLogo.setFitWidth(320);
             sideLogo.setPreserveRatio(true);
             sideLogo.setSmooth(true);
-            // we'll center it vertically and nudge right so about half sits over the card's inner empty area
             sideLogo.setTranslateX(40);
             sideLogo.setTranslateY(0);
         } catch (Exception ignore) {
-            // fallback sizing if image fails
             sideLogo.setFitWidth(320);
             sideLogo.setPreserveRatio(true);
         }
-        // don't add the image as a child of leftBox — we'll layer it above the card so it appears on top
-        // reserve left box width so the layout keeps the same spacing
         leftBox.setPrefWidth(260);
 
-        // Right card form (outer beige card). Inside it we'll place a left empty area and a white inner form pane
         VBox outerCard = new VBox();
         outerCard.setPadding(new Insets(12));
         outerCard.setAlignment(Pos.TOP_CENTER);
         outerCard.setStyle("-fx-background-color: white; -fx-border-radius:18; -fx-background-radius:18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0.12, 0, 6);");
 
-        // Inner HBox: left empty pane (where logo should align) + right white form pane
         HBox inner = new HBox();
         inner.setAlignment(Pos.TOP_LEFT);
 
-        // left empty area inside the card (transparent surface) - logo will visually sit over this area
         Region innerLeft = new Region();
-        // set this so roughly half (or slightly less) of the logo sits on the empty side
         innerLeft.setPrefWidth(140);
 
-        // white form pane that contains the inputs and controls
         VBox formPane = new VBox(12);
         formPane.setPadding(new Insets(18));
         formPane.setAlignment(Pos.TOP_CENTER);
         formPane.setStyle("-fx-background-color: white; -fx-border-radius: 12; -fx-background-radius: 12;");
-        // make the white form slightly narrower to balance with the empty area
         formPane.setPrefWidth(360);
 
         lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#6b5146;");
         Label subtitle = new Label("Choose Account Type");
         subtitle.setStyle("-fx-text-fill: #8b6a57; -fx-font-weight:600;");
 
-        // Role toggle buttons (styled as bar buttons) that sync with roleChoice
         ToggleGroup tg = new ToggleGroup();
         ToggleButton tbCare = new ToggleButton("Caregiver");
         ToggleButton tbPatient = new ToggleButton("Patient");
-        // Prepare ImageView placeholders so we can modify their effects on hover/select
         ImageView careIv = new ImageView();
         ImageView patientIv = new ImageView();
-        // Load role icons and put them above the button text (TOP)
         try {
             String careIconPath = "file:media/caregiver-icon.png";
             javafx.scene.image.Image careImg = new javafx.scene.image.Image(careIconPath);
@@ -181,7 +160,7 @@ public class Main extends Application {
             careIv.setSmooth(true);
             tbCare.setGraphic(careIv);
             tbCare.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
-        } catch (Exception ignore) { /* ignore icon load */ }
+        } catch (Exception ignore) { }
         try {
             String patientIconPath = "file:media/patient-logo.png";
             javafx.scene.image.Image patientImg = new javafx.scene.image.Image(patientIconPath);
@@ -191,39 +170,31 @@ public class Main extends Application {
             patientIv.setSmooth(true);
             tbPatient.setGraphic(patientIv);
             tbPatient.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
-        } catch (Exception ignore) { /* ignore icon load */ }
+        } catch (Exception ignore) { }
         tbCare.setToggleGroup(tg); tbPatient.setToggleGroup(tg);
         tbCare.setSelected(true);
-        // selected / unselected styles (selected shows a highlighted border)
-        // selected and unselected styles updated to warm beige/brown palette
         String selStyle = "-fx-background-color: linear-gradient(#e6ddd6, #d1c6bd); -fx-text-fill: #2c2a29; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18; -fx-border-color:#a8846b; -fx-border-width:2; -fx-border-radius:8;";
         String unselStyle = "-fx-background-color: white; -fx-border-color:#efe6dd; -fx-text-fill:#6b5146; -fx-font-weight:600; -fx-background-radius:8; -fx-padding:10 18;";
         tbCare.setStyle(selStyle);
         tbPatient.setStyle(unselStyle);
         tbCare.setPrefWidth(150); tbPatient.setPrefWidth(150);
 
-        // Create reusable effects for icon tinting
         javafx.scene.effect.DropShadow hoverShadowCare = new javafx.scene.effect.DropShadow(18, javafx.scene.paint.Color.web("#a8846b"));
         javafx.scene.effect.DropShadow hoverShadowPatient = new javafx.scene.effect.DropShadow(18, javafx.scene.paint.Color.web("#a8846b"));
         javafx.scene.effect.DropShadow selectedShadow = new javafx.scene.effect.DropShadow(22, javafx.scene.paint.Color.web("#8b644a"));
-        // stronger blue tint on hover/selected: shift hue toward blue and increase saturation
         javafx.scene.effect.ColorAdjust hoverColorAdjust = new javafx.scene.effect.ColorAdjust();
-        // subtle warm tint adjustments for a cohesive look with the logo
         hoverColorAdjust.setHue(-0.08);
         hoverColorAdjust.setSaturation(0.18);
         hoverColorAdjust.setBrightness(0.02);
-        // chain the color adjust under the drop shadow so the icon glows blue
         hoverShadowCare.setInput(hoverColorAdjust);
         hoverShadowPatient.setInput(hoverColorAdjust);
         selectedShadow.setInput(hoverColorAdjust);
 
-        // Sync toggle selection with roleChoice value and update styles and icon effects
         tg.selectedToggleProperty().addListener((obs, oldT, newT) -> {
             if (newT == tbCare) {
                 roleChoice.setValue("Caregiver");
                 tbCare.setStyle(selStyle);
                 tbPatient.setStyle(unselStyle);
-                // apply selected effect to care icon and clear patient icon effect
                 careIv.setEffect(selectedShadow);
                 patientIv.setEffect(null);
             } else if (newT == tbPatient) {
@@ -235,7 +206,6 @@ public class Main extends Application {
             }
         });
 
-        // Hover behaviour: stronger visual feedback + blue tint glow on the icon
         tbCare.setOnMouseEntered(evt -> {
             if (!tbCare.isSelected()) {
                 tbCare.setStyle(unselStyle + " -fx-effect: dropshadow(gaussian, rgba(168,132,107,0.30), 16, 0.2, 0, 5);");
@@ -261,7 +231,6 @@ public class Main extends Application {
             }
         });
 
-        // Also ensure clicking the buttons themselves sets the toggle selection and styles (keeps logic consistent)
         tbCare.setOnAction(evt -> {
             tbCare.setSelected(true); roleChoice.setValue("Caregiver"); tbCare.setStyle(selStyle); tbPatient.setStyle(unselStyle);
             careIv.setEffect(selectedShadow); patientIv.setEffect(null);
@@ -274,7 +243,6 @@ public class Main extends Application {
         HBox roleBar = new HBox(12, tbCare, tbPatient);
         roleBar.setAlignment(Pos.CENTER);
 
-        // Inputs (formPane inner width reduced so it looks balanced)
         tfEmail.setPrefWidth(320);
         pf.setPrefWidth(320);
         tfEmail.setStyle("-fx-background-radius:6; -fx-border-radius:6; -fx-padding:8; -fx-border-color: #efe6dd;");
@@ -288,39 +256,29 @@ public class Main extends Application {
         Button signupLink = new Button("Signup");
         signupLink.setStyle("-fx-background-color: transparent; -fx-text-fill:#6b5146; -fx-underline:true; -fx-padding:6 10; -fx-font-weight:600;");
 
-        // wire our visible primary login button to the same logic as btnLogin
         loginPrimary.setOnAction(btnLogin.getOnAction());
 
-        // We'll show the secondary controls in a compact footer row
         HBox footerRow = new HBox(12);
         footerRow.setAlignment(Pos.CENTER_LEFT);
         Label noAcc = new Label("No account?"); noAcc.setStyle("-fx-text-fill:#7e98c9;");
         footerRow.getChildren().addAll(noAcc, signupLink);
 
-        // signupLink triggers the original sign-up dialog
         signupLink.setOnAction(btnSignUpCaregiver.getOnAction());
 
-        // place original hidden roleChoice in scene graph so logic stays intact
         VBox hidden = new VBox(roleChoice); hidden.setVisible(false); hidden.setManaged(false);
 
-        // assemble formPane (white box)
         formPane.getChildren().addAll(lblTitle, subtitle, roleBar, emailLabel, tfEmail, passLabel, pf, loginPrimary, footerRow, status, hidden);
 
-        // add left empty area and the white form pane into inner HBox
         inner.getChildren().addAll(innerLeft, formPane);
 
-        // put inner into outerCard
         outerCard.getChildren().add(inner);
 
-        // Layout: build a base HBox (left spacer + outer card), then layer the logo on top using a StackPane
         HBox base = new HBox(12);
         base.setAlignment(Pos.TOP_LEFT);
         base.getChildren().addAll(leftBox, outerCard);
 
-        // create a StackPane so the logo can be placed above the card (not behind it)
         StackPane stack = new StackPane();
         stack.getChildren().addAll(base, sideLogo);
-        // align logo centered vertically on the left side of the layout (not under the card) and nudge horizontally
         StackPane.setAlignment(sideLogo, Pos.CENTER_LEFT);
         sideLogo.setTranslateX(40);
         sideLogo.setTranslateY(0);
@@ -330,7 +288,6 @@ public class Main extends Application {
 
         root.setCenter(stack);
 
-        // bottom small footer
         Label footer = new Label("© MemoraCare");
         footer.setStyle("-fx-text-fill: #6b5146;");
         BorderPane.setAlignment(footer, Pos.CENTER);
@@ -342,7 +299,6 @@ public class Main extends Application {
 
     private void showCaregiverDashboard(Caregiver caregiver) {
 
-        // ROOT + SCROLL
         BorderPane root = new BorderPane();
 
         ScrollPane mainScroll = new ScrollPane();
@@ -358,7 +314,6 @@ public class Main extends Application {
         Scene scene = new Scene(root, 1100, 720);
         primaryStage.setScene(scene);
 
-        // ---------------- HEADER ----------------
         VBox header = new VBox(15);
         header.setPadding(new Insets(22));
         header.setStyle(
@@ -394,7 +349,6 @@ public class Main extends Application {
         header.getChildren().addAll(topRow, nameLbl);
         page.getChildren().add(header);
 
-        // ---------------- PATIENT CARD ----------------
         VBox patientCard = new VBox(12);
         patientCard.setPadding(new Insets(18));
         patientCard.setStyle(
@@ -412,7 +366,6 @@ public class Main extends Application {
         patientCard.getChildren().addAll(patientTitle, patientBox);
         page.getChildren().add(patientCard);
 
-        // ---------------- TABS SECTION ----------------
         TabPane tabs = new TabPane();
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabs.setStyle("-fx-background-color:transparent;");
@@ -483,14 +436,12 @@ public class Main extends Application {
         };
         refresh.run();
 
-        // form
         TextField tfName = new TextField(); tfName.setPromptText("Name");
         TextField tfRel = new TextField(); tfRel.setPromptText("Relationship");
         TextField tfPhone = new TextField(); tfPhone.setPromptText("Phone");
         ChoiceBox<String> cbGender = new ChoiceBox<>(FXCollections.observableArrayList("", "Male", "Female"));
         cbGender.setValue("");
         TextField tfRelMediaPath = new TextField(); tfRelMediaPath.setPromptText("Media file path");
-        // new fields: email, address, birthday
         TextField tfRelEmail = new TextField(); tfRelEmail.setPromptText("Email");
         TextField tfRelAddress = new TextField(); tfRelAddress.setPromptText("Address");
         DatePicker dpBirthday = new DatePicker(); dpBirthday.setPromptText("Birthday");
@@ -513,19 +464,17 @@ public class Main extends Application {
                 String address = tfRelAddress.getText().trim();
                 java.time.LocalDate birthday = dpBirthday.getValue();
                 if (name.isEmpty()) { status.setText("Name required"); return; }
-                // use the full constructor so email/address/birthday are stored
                 Relative r = new Relative(
                         name,
                         rel.isEmpty()?"":rel,
-                        "",              // description
-                        phone,            // phoneNumber
-                        email,            // email
-                        (gender == null ? "" : gender), // gender
-                        address,          // address
-                        null,             // photoPath
-                        birthday          // birthday
+                        "",
+                        phone,
+                        email,
+                        (gender == null ? "" : gender),
+                        address,
+                        null,
+                        birthday
                 );
-                // attach single optional media from inline inputs (if provided)
                 try {
                     String path = tfRelMediaPath.getText().trim();
                     String type = cbRelMediaType.getValue();
@@ -533,27 +482,20 @@ public class Main extends Application {
                     if (!path.isEmpty() && type != null && !type.trim().isEmpty()) {
                         Media m = new Media(path, type, desc);
                         r.addMedia(m);
-                        // if this media is an image and the relative has no photo, set it as the profile photo
                         try {
                             if (type != null && type.equalsIgnoreCase("image") && (r.getPhotoPath() == null || r.getPhotoPath().trim().isEmpty())) {
                                 r.setPhotoPath(path);
                             }
                         } catch (Exception ignoreSetPhoto) {
-                            // non-fatal: leave media attached but photoPath unset if setPhotoPath refused
                         }
                     }
                 } catch (Exception exMedia) {
-                    // attach failed -> report but still add Relative
                     status.setText("Relative added but media failed: " + exMedia.getMessage());
                 }
                 caregiver.addRelative(r);
-                // persist caregiver update
                 fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
-                // ensure the separate Patient account (if exists) is also updated so patient view sees the new relative
                 syncPatientToAccounts(caregiver);
-                // debug: dump patient contents to console so we can verify media were attached and saved
                 dumpPatientToConsole(caregiver.getPatient());
-                // refresh any open 'Associate relatives' selector lists in the UI so Memories tab shows new relative
                 refreshAssociateRelativesInUI(caregiver);
                 tfName.clear(); tfRel.clear(); tfPhone.clear();
                 cbGender.setValue("");
@@ -574,9 +516,7 @@ public class Main extends Application {
             try {
                 caregiver.deleteRelative(sel.getName());
                 fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
-                // sync patient as well
                 syncPatientToAccounts(caregiver);
-                // refresh memories' relative selectors so the deleted relative disappears
                 refreshAssociateRelativesInUI(caregiver);
                 status.setText("Deleted.");
                 refresh.run();
@@ -584,7 +524,6 @@ public class Main extends Application {
             } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
         });
 
-        // use a compact grid form so the media inputs are visible and aligned like other fields
         GridPane formGrid = new GridPane();
         formGrid.setHgap(6); formGrid.setVgap(6);
         formGrid.add(new Label("Name:"), 0, 0); formGrid.add(tfName, 1, 0);
@@ -600,7 +539,6 @@ public class Main extends Application {
         HBox buttonsRow = new HBox(6, btnAdd);
         formGrid.add(buttonsRow, 0, 6, 4, 1);
 
-        // File chooser for relatives media
         btnRelPick.setOnAction(evt -> {
             FileChooser fc = new FileChooser();
             fc.setTitle("Choose media file");
@@ -615,7 +553,6 @@ public class Main extends Application {
             }
         });
 
-        // show pending media list right under the form so it's clearly visible
         box.getChildren().addAll(lv, formGrid, btnDelete, status);
         return box;
     }
@@ -646,23 +583,19 @@ public class Main extends Application {
         TextField tfDesc = new TextField(); tfDesc.setPromptText("Description");
         DatePicker dp = new DatePicker();
         dp.setPromptText("Date");
-        // allow selecting existing relatives to associate with the memory
         ListView<Relative> relSelect = new ListView<>();
         relSelect.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         Label status = new Label();
-        // populate relatives selection when refreshed
         Runnable refreshRelSelect = () -> {
             relSelect.getItems().clear();
             Patient p = caregiver.getPatient();
             if (p != null) relSelect.getItems().addAll(p.getRelatives());
         };
         refreshRelSelect.run();
-        // Media inputs for memory (support multiple media items)
         TextField tfMediaPath = new TextField(); tfMediaPath.setPromptText("Media file path");
         Button btnMemPick = new Button("Choose...");
         ChoiceBox<String> cbMediaType = new ChoiceBox<>(FXCollections.observableArrayList("image","audio","video","file")); cbMediaType.setValue("image");
         TextField tfMediaDesc = new TextField(); tfMediaDesc.setPromptText("Media description");
-        // list to hold multiple media for this memory
         ObservableList<Media> memMediaObjects = FXCollections.observableArrayList();
         ListView<Media> memMediaList = new ListView<>(memMediaObjects);
         memMediaList.setPrefHeight(100);
@@ -685,7 +618,6 @@ public class Main extends Application {
             if (path.isEmpty()) { status.setText("Media path required"); return; }
             Media mm = new Media(path, type == null ? "file" : type, desc);
             memMediaObjects.add(mm);
-            // clear inputs
             tfMediaPath.clear(); tfMediaDesc.clear(); cbMediaType.setValue("image");
             status.setText("Media added to list (" + mm.getMediaType() + ")");
         });
@@ -704,17 +636,14 @@ public class Main extends Application {
                 String name = tfName.getText().trim();
                 String desc = tfDesc.getText().trim();
                 if (name.isEmpty()) { status.setText("Name required"); return; }
-                // convert DatePicker value to java.util.Date (midnight)
                 Date dateVal = new Date();
                 if (dp.getValue() != null) {
                     java.time.LocalDate ld = dp.getValue();
                     java.time.LocalDateTime ldt = ld.atStartOfDay();
                     dateVal = java.util.Date.from(ldt.atZone(java.time.ZoneId.systemDefault()).toInstant());
                 }
-                // gather selected relatives
                 List<Relative> selectedRels = new ArrayList<>();
                 selectedRels.addAll(relSelect.getSelectionModel().getSelectedItems());
-                // gather media items (use memMediaObjects list). Also include current inputs as a fallback
                 List<Media> mediaForMemory = new ArrayList<>();
                 mediaForMemory.addAll(memMediaObjects);
                 try {
@@ -722,22 +651,18 @@ public class Main extends Application {
                     String curType = cbMediaType.getValue();
                     String curDesc = tfMediaDesc.getText().trim();
                     if (!curPath.isEmpty()) {
-                        // avoid duplicate by path
                         boolean exists = false;
                         for (Media _mm : mediaForMemory) if (_mm != null && curPath.equals(_mm.getMediaPath())) { exists = true; break; }
                         if (!exists) mediaForMemory.add(new Media(curPath, curType == null ? "file" : curType, curDesc));
                     }
-                } catch (Exception ignore) { /* non-fatal */ }
+                } catch (Exception ignore) { }
                 Memory m = new Memory(java.util.UUID.randomUUID(), name, desc, dateVal, selectedRels, mediaForMemory);
                 caregiver.addMemory(m);
                 fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
                 syncPatientToAccounts(caregiver);
-                // debug: dump patient contents so we can see saved memory and media
                 dumpPatientToConsole(caregiver.getPatient());
-                // also refresh any associate-relatives lists (in case new relative was just added elsewhere)
                 refreshAssociateRelativesInUI(caregiver);
                 tfName.clear(); tfMediaPath.clear(); tfMediaDesc.clear(); cbMediaType.setValue("image");
-                // clear the media list after memory creation
                 memMediaObjects.clear();
                 status.setText("Added memory.");
                 refresh.run();
@@ -759,7 +684,6 @@ public class Main extends Application {
             } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
         });
 
-        // layout a compact grid form so media inputs are visible and align with other fields
         GridPane formGrid = new GridPane();
         formGrid.setHgap(6); formGrid.setVgap(6);
         formGrid.add(new Label("Name:"), 0, 0); formGrid.add(tfName, 1, 0);
@@ -768,7 +692,6 @@ public class Main extends Application {
         formGrid.add(new Label("Media path:"), 2, 1); formGrid.add(tfMediaPath, 3, 1); formGrid.add(btnMemPick, 0, 2);
         formGrid.add(new Label("Type:"), 0, 2); formGrid.add(cbMediaType, 1, 2);
         formGrid.add(new Label("Media desc:"), 2, 2); formGrid.add(tfMediaDesc, 3, 2);
-        // media list and controls
         formGrid.add(new Label("Media list:"), 0, 3);
         formGrid.add(memMediaList, 1, 3, 3, 1);
         HBox mediaButtons = new HBox(6, btnAddMedia, btnRemoveMedia);
@@ -776,7 +699,6 @@ public class Main extends Application {
         HBox buttonsRow = new HBox(6, btnAdd);
         formGrid.add(buttonsRow, 0, 5, 4, 1);
 
-        // File chooser for memory media
         btnMemPick.setOnAction(evt -> {
             FileChooser fc = new FileChooser();
             fc.setTitle("Choose media file");
@@ -792,10 +714,7 @@ public class Main extends Application {
         });
 
         VBox right = new VBox(6, new Label("Associate relatives (select multiple):"), relSelect);
-        // show pending media list right under the form so it's clearly visible
         box.getChildren().addAll(lv, formGrid, btnDelete, status);
-        // ensure relSelect repopulates when patient changes
-        // Note: refreshRelSelect is called at creation and whenever caregiver's patient changes via other actions
         return new VBox(8, box, new Label(""), right);
     }
 
@@ -847,7 +766,7 @@ public class Main extends Application {
                             int hh = Integer.parseInt(parts[0]);
                             int mm = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
                             time = java.time.LocalTime.of(hh, mm);
-                        } catch (Exception ex) { /* fall back to 09:00 */ }
+                        } catch (Exception ex) { }
                     }
                     when = LocalDateTime.of(date, time);
                 }
@@ -882,7 +801,6 @@ public class Main extends Application {
         return box;
     }
 
-    // helper: when caregiver's patient object changes, copy it into the stored accounts so patient logins see updates
     private void syncPatientToAccounts(Caregiver caregiver) {
         if (caregiver == null) return;
         Patient p = caregiver.getPatient();
@@ -894,10 +812,8 @@ public class Main extends Application {
             if (u instanceof Patient) {
                 Patient stored = (Patient) u;
                 if (stored.getEmail() != null && stored.getEmail().equals(p.getEmail())) {
-                    // merge basic fields
                     stored.setName(p.getName());
                     stored.setPatientStage(p.getPatientStage());
-                    // replace collections by clearing and adding
                     stored.getRelatives().clear();
                     stored.getRelatives().addAll(p.getRelatives());
                     stored.getMemories().clear();
@@ -911,7 +827,6 @@ public class Main extends Application {
             }
         }
         if (!found) {
-            // add new patient account if missing
             accounts.add(p);
         }
         fh.saveAccounts(accounts);
@@ -941,7 +856,6 @@ public class Main extends Application {
             String pass = pf.getText();
             String stage = tfStage.getText().trim();
             if (name.isEmpty() || email.isEmpty() || pass.length() < 1) return;
-            // check email uniqueness
             ArrayList<User> accounts = fh.loadAccounts();
             for (User u : accounts) if (u.getEmail() != null && u.getEmail().equals(email)) return;
             Patient p = new Patient(name, java.util.UUID.randomUUID(), email, pass, stage);
@@ -949,16 +863,13 @@ public class Main extends Application {
             try {
                 caregiver.addPatient(p);
             } catch (Exception ex) {
-                // already has a patient - ignore
             }
             fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
-            // persist the patient copy so patient logins see the new patient contents
             syncPatientToAccounts(caregiver);
             updatePatientBox(patientBox, caregiver);
         }
     }
 
-    // Add back the edit dialog that was referenced by the caregiver UI
     private void showEditPatientDialog(Caregiver caregiver, VBox patientBox) {
         Patient p = caregiver.getPatient();
         if (p == null) return;
@@ -975,7 +886,6 @@ public class Main extends Application {
         if (res.isPresent() && res.get() == ButtonType.OK) {
             try {
                 caregiver.editPatient(tfName.getText().trim(), tfStage.getText().trim());
-                // Update stored patient account (if it exists) so saved accounts reflect edits
                 ArrayList<User> accounts = fh.loadAccounts();
                 for (User u : accounts) {
                     if (u instanceof Patient && ((Patient) u).getEmail() != null && ((Patient) u).getEmail().equals(p.getEmail())) {
@@ -985,7 +895,6 @@ public class Main extends Application {
                 }
                 fh.saveAccounts(accounts);
                 fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
-                // ensure stored patient account reflects edits too
                 syncPatientToAccounts(caregiver);
                 updatePatientBox(patientBox, caregiver);
             } catch (Exception ex) {
@@ -995,12 +904,10 @@ public class Main extends Application {
         }
     }
 
-    // NEW: Sign-up dialogs
     private void showSignUpCaregiverDialog() {
         Dialog<ButtonType> dlg = new Dialog<>();
         dlg.setTitle("Sign up - Caregiver");
 
-        // header graphic (small logo) to match login theme
         try {
             String logoPath = "file:/C:/Users/Mehrail Seddik10 24/IdeaProjects/OOP_Project/media/WhatsApp Image 2025-12-08 at 02.09.15_16f50d91.jpg";
             javafx.scene.image.Image lg = new javafx.scene.image.Image(logoPath);
@@ -1008,7 +915,7 @@ public class Main extends Application {
             headerLogo.setFitWidth(64);
             headerLogo.setPreserveRatio(true);
             dlg.getDialogPane().setGraphic(headerLogo);
-        } catch (Exception ignore) { /* ignore image load problems */ }
+        } catch (Exception ignore) { }
 
         GridPane g = new GridPane(); g.setHgap(8); g.setVgap(8);
         TextField tfName = new TextField(); tfName.setPromptText("Name");
@@ -1022,27 +929,22 @@ public class Main extends Application {
         dlg.getDialogPane().setStyle("-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding:14;");
         dlg.getDialogPane().setPrefWidth(440);
 
-        // color all labels inside the grid to match theme
         for (javafx.scene.Node node : g.getChildren()) {
             if (node instanceof Label) {
                 ((Label) node).setStyle("-fx-text-fill:#6b5146; -fx-font-weight:600;");
             }
         }
-        // style inputs
         tfName.setStyle("-fx-border-color:#efe6dd; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
         tfEmail.setStyle("-fx-border-color:#efe6dd; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
         pf.setStyle("-fx-border-color:#efe6dd; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;");
 
-        // Add the standard dialog buttons
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        // Style the OK / Cancel buttons to match theme
         javafx.scene.control.Button okBtn = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
         javafx.scene.control.Button cancelBtn = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.CANCEL);
         if (okBtn != null) okBtn.setStyle("-fx-background-color: linear-gradient(#e6ddd6, #d1c6bd); -fx-text-fill: #2c2a29; -fx-background-radius:6; -fx-padding:6 14;");
         if (cancelBtn != null) cancelBtn.setStyle("-fx-background-color: transparent; -fx-text-fill:#6b5146; -fx-padding:6 10; -fx-underline:true;");
 
-        // Keep original OK handling logic exactly as before
         Optional<ButtonType> res = dlg.showAndWait();
         if (res.isPresent() && res.get() == ButtonType.OK) {
             String name = tfName.getText().trim();
@@ -1062,30 +964,26 @@ public class Main extends Application {
         }
     }
 
-    // java
     private void showPatientView(Patient patient) {
 
-        // ROOT + GLOBAL SCROLL
         BorderPane root = new BorderPane();
         ScrollPane mainScroll = new ScrollPane();
         mainScroll.setFitToWidth(true);
-        mainScroll.setStyle("-fx-background: #E2DCC2; -fx-border-color: transparent;"); // darker beige
+        mainScroll.setStyle("-fx-background: #E2DCC2; -fx-border-color: transparent;");
         root.setCenter(mainScroll);
 
         Scene scene = new Scene(root, 1000, 700);
         primaryStage.setScene(scene);
 
-        // PAGE CONTENT
         VBox page = new VBox(50);
         page.setPadding(new Insets(35));
-        page.setStyle("-fx-background-color: #E2DCC2;"); // darker beige
+        page.setStyle("-fx-background-color: #E2DCC2;");
         mainScroll.setContent(page);
 
-        // -------------------- HEADER -------------------------
         VBox headerBox = new VBox(20);
         headerBox.setPadding(new Insets(25));
         headerBox.setStyle(
-                "-fx-background-color: #D8CBAE;" + // rich beige
+                "-fx-background-color: #D8CBAE;" +
                         "-fx-background-radius: 18;" +
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10,0,0,3);"
         );
@@ -1130,13 +1028,12 @@ public class Main extends Application {
         headerBox.getChildren().addAll(welcomeRow, stageLabel, searchField);
         page.getChildren().add(headerBox);
 
-        // -------------------- REMINDERS ---------------------
         VBox remSection = new VBox(20);
         Label remTitle = new Label("Upcoming Reminders");
         remTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #3B3B3B;");
 
         FlowPane remCards = new FlowPane(25, 25);
-        remCards.setPrefWrapLength(950); // longer width
+        remCards.setPrefWrapLength(950);
         remCards.setPadding(new Insets(10));
         remSection.getChildren().addAll(remTitle, remCards);
         page.getChildren().add(remSection);
@@ -1146,7 +1043,7 @@ public class Main extends Application {
         for (Reminder r : reminders) {
             VBox card = new VBox(10);
             card.setPadding(new Insets(18));
-            card.setPrefWidth(320); // wider card
+            card.setPrefWidth(320);
             card.setStyle(
                     "-fx-background-color: #F0E1B8;" +
                             "-fx-background-radius: 18;" +
@@ -1168,7 +1065,6 @@ public class Main extends Application {
             allReminderCards.add(card);
         }
 
-        // -------------------- MEMORIES ---------------------
         VBox memSection = new VBox(20);
         Label memTitle = new Label("Your Memories");
         memTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #3B3B3B;");
@@ -1184,20 +1080,20 @@ public class Main extends Application {
         for (Memory m : memories) {
             VBox card = new VBox(12);
             card.setPadding(new Insets(18));
-            card.setPrefWidth(280); // smaller width
+            card.setPrefWidth(280);
             card.setStyle(
                     "-fx-background-color: #F0E1B8;" +
                             "-fx-background-radius: 18;" +
                             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6,0,0,2);"
             );
-            card.setAlignment(Pos.CENTER); // center everything
+            card.setAlignment(Pos.CENTER);
 
             Node thumb = getMemoryThumbnail(m);
             card.getChildren().add(thumb);
 
             Label mName = new Label(safeString(m.getName()));
             mName.setStyle("-fx-font-weight: bold; -fx-text-fill: #3B3B3B;");
-            mName.setAlignment(Pos.CENTER); // center text
+            mName.setAlignment(Pos.CENTER);
 
             Label mDesc = new Label(safeString(m.getDescription()));
             mDesc.setWrapText(true);
@@ -1212,8 +1108,6 @@ public class Main extends Application {
             allMemoryCards.add(card);
         }
 
-
-        // -------------------- RELATIVES ---------------------
         VBox relSection = new VBox(20);
         Label relTitle = new Label("Closest Relatives");
         relTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #3B3B3B;");
@@ -1230,7 +1124,7 @@ public class Main extends Application {
             VBox card = new VBox(12);
             card.setAlignment(Pos.TOP_CENTER);
             card.setPadding(new Insets(15));
-            card.setPrefWidth(200); // wider card
+            card.setPrefWidth(200);
             card.setStyle(
                     "-fx-background-color: #F0E1B8;" +
                             "-fx-background-radius: 18;" +
@@ -1262,7 +1156,6 @@ public class Main extends Application {
             allRelativeCards.add(card);
         }
 
-        // -------------------- SEARCH FUNCTIONALITY ---------------------
         searchField.textProperty().addListener((obs, oldText, newText) -> {
             String q = newText.toLowerCase().trim();
             filterCards(allReminderCards, remCards, q);
@@ -1273,7 +1166,6 @@ public class Main extends Application {
         primaryStage.setTitle("Patient Dashboard - " + safeName(patient.getName()));
     }
 
-    // filterCards and getMemoryThumbnail remain unchanged
     private Node getMemoryThumbnail(Memory mem) {
         try {
             if (mem == null || mem.getMediaList() == null) {
@@ -1330,7 +1222,6 @@ public class Main extends Application {
         return false;
     }
 
-    // Show a memory details dialog including list of attached media and ability to open files
     private void showMemoryDetailsDialog(Memory mem) {
         if (mem == null) return;
         Stage dlg = new Stage();
@@ -1375,7 +1266,6 @@ public class Main extends Application {
         dlg.showAndWait();
     }
 
-    // Show a relative details dialog with contact info
     private void showRelativeDetailsDialog(Relative rel) {
         if (rel == null) return;
         Stage dlg = new Stage();
@@ -1406,7 +1296,6 @@ public class Main extends Application {
     private static String safeString(String s) { return s == null ? "" : s; }
     private static String safeName(String s) { return s == null ? "(no name)" : s; }
 
-    // Debug helper: print patient contents (relatives/memories/reminders and attached media paths)
     private void dumpPatientToConsole(Patient p) {
         if (p == null) { System.out.println("dumpPatientToConsole: patient is null"); return; }
         System.out.println("--- DUMP PATIENT: " + p.getEmail() + " / " + p.getName() + " ---");
@@ -1424,7 +1313,6 @@ public class Main extends Application {
         System.out.println("--- END DUMP ---");
     }
 
-    // Walk the active scene and refresh any ListView used for 'Associate relatives' selectors inside the Memories tab
     @SuppressWarnings("unchecked")
     private void refreshAssociateRelativesInUI(Caregiver caregiver) {
         try {
@@ -1433,7 +1321,6 @@ public class Main extends Application {
             if (sc == null) return;
             javafx.scene.Parent root = sc.getRoot();
             if (root == null) return;
-            // recursive traversal
             java.util.ArrayDeque<javafx.scene.Node> dq = new java.util.ArrayDeque<>();
             dq.add(root);
             while (!dq.isEmpty()) {
@@ -1451,7 +1338,7 @@ public class Main extends Application {
                                         list.getItems().clear();
                                         Patient p = caregiver == null ? null : caregiver.getPatient();
                                         if (p != null) for (Relative r : p.getRelatives()) list.getItems().add(r);
-                                    } catch (Exception ignore) { /* ignore UI refresh issues */ }
+                                    } catch (Exception ignore) { }
                                 }
                             }
                         }

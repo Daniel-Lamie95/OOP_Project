@@ -29,17 +29,17 @@ public class Memory extends PatientInfo implements Serializable{
         this.description = description;
     }
 
-    // return a defensive copy to prevent callers from mutating internal Date
+
     public Date getDate() {
         return date == null ? null : new Date(date.getTime());
     }
 
-    // store a defensive copy; accept null by defaulting to now and avoid throwing on future dates
+
     public void setDate(Date date) {
-        // defensively default null to current time
+
         Date toSet = (date == null) ? new Date() : new Date(date.getTime());
         long now = System.currentTimeMillis();
-        // If caller passed a future date, clamp to now instead of throwing to avoid crashes
+
         if (toSet.getTime() > now) {
             toSet = new Date();
         }
@@ -47,7 +47,7 @@ public class Memory extends PatientInfo implements Serializable{
     }
 
     public List<Relative> getRelatives() {
-        // return a defensive copy so callers cannot modify the internal list directly
+
         return new ArrayList<>(relatives);
     }
 
@@ -77,11 +77,11 @@ public class Memory extends PatientInfo implements Serializable{
         }
     }
     public List<Media> getMediaList() {
-        // return defensive copy to prevent external mutation of internal list
+
         return new ArrayList<>(mediaList);
     }
 
-    // helper to detect media duplicates by file path
+
     private boolean mediaExists(String filePath) {
         if (filePath == null) return false;
         for (Media mm : mediaList) {
@@ -91,13 +91,13 @@ public class Memory extends PatientInfo implements Serializable{
     }
 
     public void addMedia(Media media) {
-        // ignore nulls and avoid duplicate or invalid media (by file path)
+
         if (media == null) return;
         String path = media.getMediaPath();
         if (path == null || path.isBlank()) return; // skip invalid media
         if (mediaExists(path)) return; // already added
         String type = media.getMediaType() == null ? "file" : media.getMediaType();
-        // store a defensive copy
+
         this.mediaList.add(new Media(path, type, media.getDescription()));
     }
 
@@ -136,7 +136,7 @@ public class Memory extends PatientInfo implements Serializable{
         return Objects.equals(getId(), memory.getId());
     }
 
-    // Ensure equals/hashCode contract: objects equal by 'id' must return same hash code.
+
     @Override
     public int hashCode() {
         return Objects.hash(getId());

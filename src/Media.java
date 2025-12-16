@@ -11,7 +11,7 @@ public class Media implements Serializable {
      private String description = "";
 
      public Media(String filePath, String mediaType, String description) {
-         // validate inputs
+
          validatefilepath(filePath);
          validatemediatype(mediaType);
          this.id = UUID.randomUUID();
@@ -50,7 +50,7 @@ public class Media implements Serializable {
          return mediaType;
      }
 
-     // Setters (public to allow controlled mutation; validate where appropriate)
+
      public void setDescription(String description) {
          this.description = description == null ? "" : description;
      }

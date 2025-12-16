@@ -28,7 +28,7 @@ public class Relative extends Person implements Serializable {
         num_of_relatives++;
     }
 
-    // Full constructor to support UI flows that collect more fields
+
     public Relative(String name, String relationship, String description, String phoneNumber,
                     String email, String gender, String address, String photoPath, LocalDate birthday) {
         super(name);
@@ -41,7 +41,7 @@ public class Relative extends Person implements Serializable {
         if (photoPath != null && !photoPath.trim().isEmpty()) {
             this.photoPath = photoPath;
         } else {
-            this.photoPath = null; // leave null until setPhotoPath is called
+            this.photoPath = null;
         }
         this.birthday = birthday;
         num_of_relatives++;

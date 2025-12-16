@@ -46,7 +46,7 @@ public class Reminder extends PatientInfo implements Serializable {
         }
     }
     public void notifyIfDue() {
-        // avoid NPE when dateOfReminder is null
+
         if (dateOfReminder == null) return;
         LocalDateTime now = LocalDateTime.now();
 
