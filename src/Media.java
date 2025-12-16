@@ -52,7 +52,7 @@ public class Media implements Serializable {
 
 
      public void setDescription(String description) {
-         this.description = description == null ? "" : description;
+         this.description = description;
      }
 
      public void setFilePath(String mediaPath) {
