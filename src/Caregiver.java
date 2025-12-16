@@ -4,9 +4,6 @@ public class Caregiver extends User implements Searchable, Serializable{
     private static final long serialVersionUID = 1L;
     private Patient patient;
 
-    public Caregiver(){
-        super();
-    }
 
     public Caregiver(String name,UUID id, String email, String password) {
         super(name, id, email, password);

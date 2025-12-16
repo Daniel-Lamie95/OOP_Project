@@ -9,13 +9,7 @@ public class Patient extends User implements Searchable, Serializable {
     private ArrayList<Memory> memories;
     private ArrayList<Reminder> reminders;
 
-    public Patient() {
-        super();
-        this.patientStage = null;
-        this.relatives = new ArrayList<>();
-        this.memories = new ArrayList<>();
-        this.reminders = new ArrayList<>();
-    }
+
 
     public Patient(String name, UUID id, String email, String password, String patientStage) {
         super(name, id, email, password);

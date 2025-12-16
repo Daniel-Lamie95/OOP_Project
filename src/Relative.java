@@ -16,9 +16,7 @@ public class Relative extends Person implements Serializable {
     private static int num_of_relatives = 0;
     private LocalDate birthday;
 
-    public Relative() {
-        super();
-    }
+
 
     public Relative(String name, String relationship, String phoneNumber, String gender) {
         super(name);
