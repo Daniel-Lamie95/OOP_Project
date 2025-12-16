@@ -17,16 +17,8 @@ import javafx.stage.Modality;
 import javafx.scene.Node;
 import java.awt.Desktop;
 import java.io.File;
-import java.util.function.Consumer;
-
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.paint.Color;
-
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
+import java.time.*;
 
 public class Main extends Application {
     private final FileHandler fh = new FileHandler();
@@ -52,10 +44,8 @@ public class Main extends Application {
         Label lblTitle = new Label("Welcome to MemoraCare");
         lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#6b5146;");
 
-        Label lblEmail = new Label("Email:");
         TextField tfEmail = new TextField();
         tfEmail.setPromptText("you@example.com");
-        Label lblPassword = new Label("Password:");
         PasswordField pf = new PasswordField();
         pf.setPromptText("Enter password");
 
@@ -499,8 +489,7 @@ public class Main extends Application {
                 refreshAssociateRelativesInUI(caregiver);
                 tfName.clear(); tfRel.clear(); tfPhone.clear();
                 cbGender.setValue("");
-                tfRelEmail.clear(); tfRelAddress.clear(); dpBirthday.setValue(null);
-                tfRelMediaPath.clear(); tfRelMediaDesc.clear(); cbRelMediaType.setValue("image");
+                tfRelEmail.clear(); tfRelMediaPath.clear(); tfRelMediaDesc.clear(); cbRelMediaType.setValue("image");
                 status.setText("Added relative.");
                 refresh.run();
                 updatePatientBox(patientBox, caregiver);
@@ -524,6 +513,56 @@ public class Main extends Application {
             } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
         });
 
+        // Edit relative
+        Button btnEdit = new Button("Edit Selected");
+        btnEdit.setOnAction(e -> {
+            Relative sel = lv.getSelectionModel().getSelectedItem();
+            if (sel == null) { status.setText("Select relative to edit"); return; }
+            Dialog<ButtonType> dlg = new Dialog<>();
+            dlg.setTitle("Edit Relative");
+            GridPane gg = new GridPane(); gg.setHgap(8); gg.setVgap(8);
+            TextField efName = new TextField(sel.getName()); efName.setDisable(true);
+            TextField efRel = new TextField(sel.getRelationship());
+            TextField efPhone = new TextField(sel.getPhoneNumber());
+            ChoiceBox<String> efGender = new ChoiceBox<>(FXCollections.observableArrayList("", "Male", "Female")); efGender.setValue(sel.getGender()==null?"":sel.getGender());
+            TextField efMedia = new TextField(sel.getPhotoPath()==null?"":sel.getPhotoPath());
+            Button efPick = new Button("Choose...");
+            TextField efEmail = new TextField(sel.getEmail());
+            TextField efAddress = new TextField(sel.getAddress());
+            DatePicker efBday = new DatePicker(sel.getBirthday());
+            gg.add(new Label("Name:"),0,0); gg.add(efName,1,0);
+            gg.add(new Label("Relationship:"),0,1); gg.add(efRel,1,1);
+            gg.add(new Label("Phone:"),0,2); gg.add(efPhone,1,2);
+            gg.add(new Label("Gender:"),0,3); gg.add(efGender,1,3);
+            gg.add(new Label("Photo path:"),0,4); gg.add(efMedia,1,4); gg.add(efPick,2,4);
+            gg.add(new Label("Email:"),0,5); gg.add(efEmail,1,5);
+            gg.add(new Label("Address:"),0,6); gg.add(efAddress,1,6);
+            gg.add(new Label("Birthday:"),0,7); gg.add(efBday,1,7);
+            efPick.setOnAction(ae -> {
+                FileChooser fc = new FileChooser(); fc.setTitle("Choose photo"); File s = fc.showOpenDialog(primaryStage);
+                if (s != null) efMedia.setText(s.getAbsolutePath());
+            });
+            dlg.getDialogPane().setContent(gg);
+            dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> resEdit = dlg.showAndWait();
+            if (resEdit.isPresent() && resEdit.get() == ButtonType.OK) {
+                try {
+                    caregiver.editRelative(sel.getName(), efRel.getText().trim(), sel.getDescription()==null?"":sel.getDescription(), efPhone.getText().trim(), efEmail.getText().trim(), efGender.getValue()==null?"":efGender.getValue(), efAddress.getText().trim(), efMedia.getText().trim());
+                    // update birthday separately on model
+                    sel.setBirthday(efBday.getValue());
+                    fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
+                    syncPatientToAccounts(caregiver);
+                    refreshAssociateRelativesInUI(caregiver);
+                    status.setText("Edited.");
+                    refresh.run();
+                    updatePatientBox(patientBox, caregiver);
+                } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
+            }
+        });
+
+        HBox relButtons = new HBox(6, btnAdd, btnEdit, btnDelete);
+        // we'll add relButtons after formGrid is created
+
         GridPane formGrid = new GridPane();
         formGrid.setHgap(6); formGrid.setVgap(6);
         formGrid.add(new Label("Name:"), 0, 0); formGrid.add(tfName, 1, 0);
@@ -536,8 +575,8 @@ public class Main extends Application {
         formGrid.add(new Label("Email:"), 0, 4); formGrid.add(tfRelEmail, 1, 4);
         formGrid.add(new Label("Address:"), 2, 4); formGrid.add(tfRelAddress, 3, 4);
         formGrid.add(new Label("Birthday:"), 0, 5); formGrid.add(dpBirthday, 1, 5);
-        HBox buttonsRow = new HBox(6, btnAdd);
-        formGrid.add(buttonsRow, 0, 6, 4, 1);
+        // add relButtons into formGrid now that it exists
+        formGrid.add(relButtons, 0, 6, 4, 1);
 
         btnRelPick.setOnAction(evt -> {
             FileChooser fc = new FileChooser();
@@ -553,7 +592,7 @@ public class Main extends Application {
             }
         });
 
-        box.getChildren().addAll(lv, formGrid, btnDelete, status);
+        box.getChildren().addAll(lv, formGrid, status);
         return box;
     }
 
@@ -684,6 +723,106 @@ public class Main extends Application {
             } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
         });
 
+        // Edit memory
+        Button btnEdit = new Button("Edit Selected");
+        btnEdit.setOnAction(e -> {
+            Memory sel = lv.getSelectionModel().getSelectedItem();
+            if (sel == null) { status.setText("Select memory to edit"); return; }
+            Dialog<ButtonType> dlg = new Dialog<>();
+            dlg.setTitle("Edit Memory");
+            GridPane gg = new GridPane(); gg.setHgap(8); gg.setVgap(8);
+            TextField efName = new TextField(sel.getName());
+            TextField efDesc = new TextField(sel.getDescription());
+            DatePicker efDate = new DatePicker(sel.getDate() != null ? sel.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null);
+            ListView<Relative> relSelectMem = new ListView<>();
+            relSelectMem.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            Runnable refreshRelSelectMem = () -> {
+                relSelectMem.getItems().clear();
+                Patient p = caregiver.getPatient();
+                if (p != null) relSelectMem.getItems().addAll(p.getRelatives());
+            };
+            refreshRelSelectMem.run();
+            // pre-select associated relatives
+            for (Relative r : sel.getRelatives()) relSelectMem.getSelectionModel().select(r);
+
+            ObservableList<Media> memMediaObjectsEdit = FXCollections.observableArrayList();
+            memMediaObjectsEdit.addAll(sel.getMediaList());
+            ListView<Media> memMediaListEdit = new ListView<>(memMediaObjectsEdit);
+            memMediaListEdit.setPrefHeight(100);
+            memMediaListEdit.setCellFactory(cell -> new ListCell<Media>() {
+                @Override
+                protected void updateItem(Media mm, boolean empty) {
+                    super.updateItem(mm, empty);
+                    if (empty || mm == null) setText(null);
+                    else setText((mm.getMediaPath()==null?"":mm.getMediaPath()) + " (" + (mm.getMediaType()==null?"":mm.getMediaType()) + ") " + (mm.getDescription()==null?"":mm.getDescription()));
+                }
+            });
+            TextField tfMediaPathEdit = new TextField(); tfMediaPathEdit.setPromptText("Media file path");
+            Button btnMemPickEdit = new Button("Choose...");
+            ChoiceBox<String> cbMediaTypeEdit = new ChoiceBox<>(FXCollections.observableArrayList("image","audio","video","file")); cbMediaTypeEdit.setValue("image");
+            TextField tfMediaDescEdit = new TextField(); tfMediaDescEdit.setPromptText("Media description");
+
+            Button btnAddMediaEdit = new Button("Add Media");
+            Button btnRemoveMediaEdit = new Button("Remove Media");
+            btnAddMediaEdit.setOnAction(ae -> {
+                String path = tfMediaPathEdit.getText().trim();
+                String type = cbMediaTypeEdit.getValue();
+                String desc = tfMediaDescEdit.getText().trim();
+                if (path.isEmpty()) { status.setText("Media path required"); return; }
+                memMediaObjectsEdit.add(new Media(path, type==null?"file":type, desc));
+                tfMediaPathEdit.clear(); tfMediaDescEdit.clear(); cbMediaTypeEdit.setValue("image");
+            });
+            btnRemoveMediaEdit.setOnAction(ae -> {
+                Media msel = memMediaListEdit.getSelectionModel().getSelectedItem();
+                if (msel == null) { status.setText("Select media to remove"); return; }
+                memMediaObjectsEdit.remove(msel);
+            });
+
+            gg.add(new Label("Name:"),0,0); gg.add(efName,1,0);
+            gg.add(new Label("Description:"),2,0); gg.add(efDesc,3,0);
+            gg.add(new Label("Date:"),0,1); gg.add(efDate,1,1);
+            gg.add(new Label("Associated relatives:"),0,2); gg.add(relSelectMem,1,2,3,1);
+            gg.add(new Label("Media list:"),0,3); gg.add(memMediaListEdit,1,3,3,1);
+            HBox mediaButtons = new HBox(6, tfMediaPathEdit, cbMediaTypeEdit, tfMediaDescEdit, btnMemPickEdit, btnAddMediaEdit, btnRemoveMediaEdit);
+            gg.add(mediaButtons,1,4,3,1);
+
+            btnMemPickEdit.setOnAction(evt -> {
+                FileChooser fc = new FileChooser(); fc.setTitle("Choose media file"); File self = fc.showOpenDialog(primaryStage);
+                if (self != null) tfMediaPathEdit.setText(self.getAbsolutePath());
+            });
+
+            dlg.getDialogPane().setContent(gg);
+            dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> resEdit = dlg.showAndWait();
+            if (resEdit.isPresent() && resEdit.get() == ButtonType.OK) {
+                try {
+                    // update name/description via caregiver API
+                    caregiver.editMemory(sel.getName(), efName.getText().trim(), efDesc.getText().trim());
+                    // update date
+                    if (efDate.getValue() != null) {
+                        Date newDate = java.util.Date.from(efDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                        sel.setDate(newDate);
+                    }
+                    // update relatives association on memory
+                    List<Relative> chosen = new ArrayList<>(relSelectMem.getSelectionModel().getSelectedItems());
+                    sel.setRelatives(chosen);
+                    // update media list on memory
+                    sel.setMediaList(new ArrayList<>(memMediaObjectsEdit));
+
+                    fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
+                    syncPatientToAccounts(caregiver);
+                    dumpPatientToConsole(caregiver.getPatient());
+                    refreshAssociateRelativesInUI(caregiver);
+                    status.setText("Edited.");
+                    refresh.run();
+                    updatePatientBox(patientBox, caregiver);
+                } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
+            }
+        });
+
+        HBox memButtons = new HBox(6, btnAdd, btnEdit, btnDelete);
+        // replace the earlier buttonsRow with memButtons when building formGrid below
+
         GridPane formGrid = new GridPane();
         formGrid.setHgap(6); formGrid.setVgap(6);
         formGrid.add(new Label("Name:"), 0, 0); formGrid.add(tfName, 1, 0);
@@ -696,8 +835,7 @@ public class Main extends Application {
         formGrid.add(memMediaList, 1, 3, 3, 1);
         HBox mediaButtons = new HBox(6, btnAddMedia, btnRemoveMedia);
         formGrid.add(mediaButtons, 1, 4);
-        HBox buttonsRow = new HBox(6, btnAdd);
-        formGrid.add(buttonsRow, 0, 5, 4, 1);
+        formGrid.add(memButtons, 0, 5, 4, 1);
 
         btnMemPick.setOnAction(evt -> {
             FileChooser fc = new FileChooser();
@@ -713,9 +851,8 @@ public class Main extends Application {
             }
         });
 
-        VBox right = new VBox(6, new Label("Associate relatives (select multiple):"), relSelect);
-        box.getChildren().addAll(lv, formGrid, btnDelete, status);
-        return new VBox(8, box, new Label(""), right);
+        box.getChildren().addAll(lv, formGrid, status);
+        return box;
     }
 
     private Pane createRemindersPane(Caregiver caregiver, VBox patientBox) {
@@ -796,7 +933,55 @@ public class Main extends Application {
             } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
         });
 
-        HBox form = new HBox(6, tfName, tfDesc, dp, tfTime, btnAdd);
+        // Edit reminder
+        Button btnEdit = new Button("Edit Selected");
+        btnEdit.setOnAction(e -> {
+            Reminder sel = lv.getSelectionModel().getSelectedItem();
+            if (sel == null) { status.setText("Select reminder to edit"); return; }
+            Dialog<ButtonType> dlg = new Dialog<>();
+            dlg.setTitle("Edit Reminder");
+            GridPane gg = new GridPane(); gg.setHgap(8); gg.setVgap(8);
+            TextField efName = new TextField(sel.getName());
+            TextField efDesc = new TextField(sel.getDescription());
+            DatePicker efDate = new DatePicker(sel.getDate() != null ? sel.getDate().toLocalDate() : null);
+            TextField tfTimeEdit = new TextField(); tfTimeEdit.setPromptText("HH:mm (optional)");
+            if (sel.getDate() != null) {
+                tfTimeEdit.setText(sel.getDate().getHour() + ":" + (sel.getDate().getMinute()<10?"0":"") + sel.getDate().getMinute());
+            }
+            gg.add(new Label("Name:"),0,0); gg.add(efName,1,0);
+            gg.add(new Label("Description:"),2,0); gg.add(efDesc,3,0);
+            gg.add(new Label("Date:"),0,1); gg.add(efDate,1,1);
+            gg.add(new Label("Time:"),2,1); gg.add(tfTimeEdit,3,1);
+            dlg.getDialogPane().setContent(gg);
+            dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> resEdit = dlg.showAndWait();
+            if (resEdit.isPresent() && resEdit.get() == ButtonType.OK) {
+                try {
+                    caregiver.editReminder(sel.getName(), efName.getText().trim(), efDesc.getText().trim());
+                    if (efDate.getValue() != null) {
+                        java.time.LocalDate date = efDate.getValue();
+                        java.time.LocalTime time = java.time.LocalTime.of(9,0);
+                        String timeText = tfTimeEdit.getText().trim();
+                        if (!timeText.isEmpty()) {
+                            try {
+                                String[] parts = timeText.split(":");
+                                int hh = Integer.parseInt(parts[0]);
+                                int mm = parts.length>1?Integer.parseInt(parts[1]):0;
+                                time = java.time.LocalTime.of(hh, mm);
+                            } catch (Exception ignore) {}
+                        }
+                        sel.setDate(java.time.LocalDateTime.of(date, time));
+                    }
+                    fh.updateAccountByEmail(caregiver.getEmail(), caregiver);
+                    syncPatientToAccounts(caregiver);
+                    status.setText("Edited.");
+                    refresh.run();
+                    updatePatientBox(patientBox, caregiver);
+                } catch (Exception ex) { status.setText("Error: " + ex.getMessage()); }
+            }
+        });
+
+        HBox form = new HBox(6, tfName, tfDesc, dp, tfTime, btnAdd, btnEdit);
         box.getChildren().addAll(lv, form, btnDelete, status);
         return box;
     }
@@ -1235,6 +1420,7 @@ public class Main extends Application {
         desc.setWrapText(true);
         content.getChildren().addAll(title, desc);
 
+        // show associated media
         List<Media> mediaList = Collections.emptyList();
         try { mediaList = mem.getMediaList() == null ? Collections.emptyList() : mem.getMediaList(); } catch (Exception ignored) {}
         for (Media mm : mediaList) {
@@ -1259,9 +1445,55 @@ public class Main extends Application {
             content.getChildren().add(row);
         }
 
+        // NEW: show associated relatives for this memory
+        List<Relative> assocRels = Collections.emptyList();
+        try { assocRels = mem.getRelatives() == null ? Collections.emptyList() : mem.getRelatives(); } catch (Exception ignored) {}
+        Label relSectionLabel = new Label("Associated Relatives");
+        relSectionLabel.setStyle("-fx-font-size:14px; -fx-font-weight:bold; -fx-padding:8 0 4 0;");
+        content.getChildren().add(relSectionLabel);
+        if (assocRels.isEmpty()) {
+            Label none = new Label("No relatives associated with this memory.");
+            none.setStyle("-fx-text-fill:#666;");
+            content.getChildren().add(none);
+        } else {
+            FlowPane relPane = new FlowPane(12,12);
+            relPane.setPrefWrapLength(520);
+            for (Relative r : assocRels) {
+                VBox card = new VBox(6);
+                card.setPadding(new Insets(8));
+                card.setPrefWidth(160);
+                card.setStyle(
+                        "-fx-background-color: #F7F4E8; -fx-background-radius:12; -fx-border-radius:12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06),4,0,0,1);"
+                );
+                card.setAlignment(Pos.TOP_CENTER);
+
+                ImageView iv = new ImageView();
+                try {
+                    if (r.getPhotoPath() != null && new File(r.getPhotoPath()).exists()) {
+                        Image img = new Image(new File(r.getPhotoPath()).toURI().toString(), 80, 80, true, true);
+                        iv.setImage(img);
+                    }
+                } catch (Exception ignored) {}
+                iv.setFitWidth(80);
+                iv.setFitHeight(80);
+                iv.setClip(new Circle(40, 40, 40));
+
+                Label rName = new Label(safeString(r.getName()));
+                rName.setStyle("-fx-font-weight:bold; -fx-text-fill:#3B3B3B;");
+
+                Label rRel = new Label(safeString(r.getRelationship()));
+                rRel.setStyle("-fx-font-size:12px; -fx-text-fill:#555;");
+
+                card.getChildren().addAll(iv, rName, rRel);
+                card.setOnMouseClicked(e -> showRelativeDetailsDialog(r));
+                relPane.getChildren().add(card);
+            }
+            content.getChildren().add(relPane);
+        }
+
         ScrollPane sp = new ScrollPane(content);
         sp.setFitToWidth(true);
-        Scene s = new Scene(sp, 560, 420);
+        Scene s = new Scene(sp, 560, 520);
         dlg.setScene(s);
         dlg.showAndWait();
     }
@@ -1357,3 +1589,5 @@ public class Main extends Application {
         launch(args);
     }
 }
+
+
