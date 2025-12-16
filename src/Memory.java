@@ -76,6 +76,7 @@ public class Memory extends PatientInfo implements Serializable{
             }
         }
     }
+
     public List<Media> getMediaList() {
 
         return new ArrayList<>(mediaList);

@@ -54,10 +54,5 @@ public class Reminder extends PatientInfo implements Serializable {
             System.out.println("Reminder:" + description + "(for" + getName() +")");
         }
     }
-    public  void addPatientInfo(PatientInfo patientInfo){
-        if(patientInfo instanceof Reminder){
 
-        }
-
-    }
 }
