@@ -1,4 +1,4 @@
-import java.io.Serializable;
+/*import java.io.Serializable;
 import java.util.ArrayList;
 public class PatientService extends UserService implements Serializable {
 
@@ -21,3 +21,5 @@ public class PatientService extends UserService implements Serializable {
         }
     }
 }
+
+ */
